@@ -62,30 +62,35 @@
 
 
 
-### 三. NFA结点类（NfaNode）的设计 ###
+### 三. NFA结点类（FANode）的设计 ###
 
-        class NfaNode  
+        // NFA的结点 与 DFA的结点中的内容并无不同，所以都用FANode就行  
+
+        class FANode  
         {  
             private :  
                 /* 此结点的编号 */  
                 int _id;  
+                
+                /* 此结点是否是终结状态（只在DFA中派用场） */  
+                bool _terminate;  
                 
                 /* 此结点的各发出边上的终结符 */  
                 /* 本来终结符是char类型的，这里用int表示，是为了能够用 -1 来表示ε边 */  
                 vector<int> _edges;  
                 
                 /* 此结点的邻接结点们（和上面各发出边的终结符是一一对应的） */  
-                vector<NfaNode *> _nexts;  
+                vector<FANode *> _nexts;  
                 
             public :  
                 /* 构造函数 */  
-                NfaNode(int id);  
+                FANode(int id);  
                 
                 /* 析构函数 */  
-                ~NfaNode();  
+                ~FANode();  
                 
                 /* 加入一个后继结点，且边的终结符是vt */  
-                void addNext(int vt, NfaNode * node);  
+                void addNext(int vt, FANode * node);  
         };  
 
 
@@ -96,10 +101,10 @@
         {  
             private :  
                 /* 起始结点 */  
-                NfaNode * _start;  
+                FANode * _start;  
                 
                 /* 终止结点 */  
-                NfaNode * _end;  
+                FANode * _end;  
             
             public :  
                 /* 根据终结符vt，构造一个简单NFA */  
@@ -110,12 +115,78 @@
                 /* 通过广度优先方式遍历这个图（注意有环，需要验重），把所有结点加入到一个数组中，遍历结束后释放数组中所有结点 */  
                 ~NFA();  
                 
-                /* 根据终结符vt（目前只有*），对一个NFA进行变换 */  
-                /* 在变换的时候可能引入新的结点，所以到指明新结点的起始编号 */  
-                static void evolve(NFA * nfa, int vt, int start_id);  
+                /* 根据终结符'*'，对一个NFA进行闭包变换 */  
+                /* 在变换的时候会引入两个新的结点，所以到指明新结点的起始编号 */  
+                static void closure(NFA * nfa, int start_id);  
                 
-                /* 根据终结符vt（目前有.和|），对两个NFA进行合并 */  
-                /* 在合并的时候可能引入新的结点，所以到指明新结点的起始编号 */  
+                /* 根据终结符'|'，对两个NFA进行合并 */  
+                /* 在合并的时候会引入两个新的结点，所以到指明新结点的起始编号 */  
                 /* 注意，把第二个NFA合并到第一个中，原来第二个NFA里的指针置空以节约内存 */  
-                static void union(NFA * left, NFA * right, int vt, int start_id);  
+                static void merge(NFA * left, NFA * right, int start_id);  
+                
+                /* 根据终结符'.'，对两个NFA进行连接 */  
+                /* 在连接的时候不会引入新的结点 */  
+                /* 注意，把第二个NFA合并到第一个中，原来第二个NFA里的指针置空以节约内存 */  
+                static void join(NFA * left, NFA * right);  
         };  
+
+
+
+### 五. 由后缀正则构造NFA的算法 ###
+
+        在上文中，我们分析并设计了NFA的四种基本操作 :  
+        {  
+            1. 根据一个终结符，构造出一个简单NFA  ---- 对应 NFA的构造函数  
+            2. 对一个已有的NFA进行闭包操作       ---- 对应 NFA::closure 函数  
+            3. 对两个NFA进行'|'式的合并         ---- 对应 NFA::merge 函数  
+            4. 对两个NFA进行连接操作            ---- 对应 NFA::join 函数  
+        }  
+        
+        那么，根据这四种基本操作，我们就可以根据一个后缀正则，来构造出复杂的NFA了  
+        // 至于如何构造后缀正则，请参考"doc/01-SuffixRegex.md"  
+        
+        算法逻辑 :  
+        
+            创建一个空栈  
+            
+            从左向右扫描后缀正则表达式  
+            {  
+                记当前输入符号为 ch  
+                
+                if( ch == '*' )  
+                {  
+                    对栈顶的NFA进行闭包操作  
+                }  
+                
+                else if( ch == '|' )  
+                {  
+                    依次从栈中弹出 NFA1, NFA2  
+                    把 NFA2|NFA1 压栈  
+                    删除NFA1  
+                }  
+                
+                else if( ch == '.' )  
+                {  
+                    依次从栈中弹出 NFA1, NFA2  
+                    把　NFA2.NFA1 压栈  
+                    删除NFA1  
+                }  
+                
+                else  
+                {  
+                    // 即ch为终结符  
+                    根据ch创建一个简单NFA，并压栈  
+                }  
+            }  
+            
+            此时，栈顶的元素就是最终的NFA  
+
+
+
+### 六.　根据多个后缀正则构造NFA的算法 ###
+
+        我们知道，单单把一个后缀正则转化为NFA是不够的  
+        我们需要把所有正则的NFA合并成一个大的NFA，然后才能执行确定化的操作使之变换为DFA  
+        
+        而在上文中，我们已经分析出了如何根据一个后缀正则来构造NFA  
+        那么，多个正则，就只要把每个正则对应的NFA用'|'合并起来就好啦  
