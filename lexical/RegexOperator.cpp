@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	08 November 2016
-Modified 	: 	08 November 2016
+Modified 	: 	12 November 2016
 Version 	: 	1.0
 */
 
@@ -50,7 +50,7 @@ namespace Seven
 		if(op == '|')
 			return 3;
 		if(op == '.')
-			return 3;
+			return 4;
 		// unsupported-operators, return 0
 		return 0;
 	}
@@ -63,11 +63,11 @@ namespace Seven
 		if(op == ')')
 			return 1;
 		if(op == '*')
-			return 6;
+			return 5;
 		if(op == '|')
 			return 2;
 		if(op == '.')
-			return 4;
+			return 3;
 		// unsupported-operators, return 0
 		return 0;
 	}

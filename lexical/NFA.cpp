@@ -1,11 +1,12 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	09 November 2016
-Modified 	: 	11 November 2016
+Modified 	: 	12 November 2016
 Version 	: 	1.0
 */
 
 #include "NFA.h"
+#include "Regex.h"
 
 #include <queue>
 using std::queue;
@@ -241,7 +242,7 @@ namespace Seven
 	}
 
 	/* create a big NFA by given all the suffix regex */
-	NFA * NFA::create(const vector<string> & suffixs)
+	NFA * NFA::create(const vector<string> & suffixs, int & start_id)
 	{
 		// if there is no suffix regex
 		size_t n = suffixs.size();
@@ -249,7 +250,6 @@ namespace Seven
 			return NULL;
 
 		// create the first NFA
-		int start_id = 1;
 		NFA * nfa = create(suffixs[0], start_id);
 
 		// merge the 'nfa' with other NFAs
@@ -262,6 +262,76 @@ namespace Seven
 		}
 
 		// return the final NFA
+		return nfa;
+	}
+
+	/* create a big NFA by some default regex */
+	NFA * NFA::create()
+	{
+		// prepare some infix regexs
+		const static string infix[] = {
+			"(_|A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z).(0|1|2|3|4|5|6|7|8|9|_|A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)*",
+			"(\t| |\n).(\t| |\n)*",
+			"0|(1|2|3|4|5|6|7|8|9).(0|1|2|3|4|5|6|7|8|9)*",
+			"#. .i.n.c.l.u.d.e", "#. .i.f.n.d.e.f", "#. .d.e.f.i.n.e", "#. .e.n.d.i.f",
+			"m.a.i.n", "n.a.m.e.s.p.a.c.e", "u.s.i.n.g",
+			"c.l.a.s.s", "s.t.r.u.c.t", "u.n.i.o.n", "e.n.u.m",
+			"p.r.i.v.a.t.e", "p.u.b.l.i.c", "s.t.a.t.i.c", "c.o.n.s.t",
+			"v.o.i.d", "b.o.o.l", "c.h.a.r", "i.n.t", "l.o.n.g", "f.l.o.a.t", "d.o.u.b.l.e",
+			":.:", "~",
+			"r.e.t.u.r.n", "i.f", "e.l.s.e", "d.o", "w.h.i.l.e", "f.o.r"
+		};
+
+		// prepare some suffix regexs
+		const static string suffix[] = {
+			"{", "}", "(", ")", ";",
+			"+", "-", "/", "+=.", "-=.", "/=.",
+			"&", "^", "&&.", "!",
+			"=", ">", "<", "==.", ">=.", "<=."
+		};
+
+		// 1. create a NFA with *  *=  |  ||
+		/*
+			because in a normal suffix regex, it includes '*', '.', '|'
+			that is to say, it will cause collusion
+			so, I have to create it manually
+		*/
+		NFA * nfa = NULL, * tmp1 = NULL, * tmp2 = NULL;
+		nfa = new NFA(int('*'), 1);
+		tmp1 = new NFA(int('*'), 3);
+		tmp2 = new NFA(int('='), 5);
+		join(tmp1, tmp2);
+		delete tmp2;
+		merge(nfa, tmp1, 7);
+		delete tmp1;
+		tmp1 = new NFA('|', 9);
+		merge(nfa, tmp1, 11);
+		delete tmp1;
+		tmp1 = new NFA('|', 13);
+		tmp2 = new NFA('|', 15);
+		join(tmp1, tmp2);
+		delete tmp2;
+		merge(nfa, tmp1, 17);
+		delete tmp1;
+		
+		// 2. create a NFA with the rest regexs
+		/*
+			those rest regexs can be created automically
+		*/
+		vector<string> all_suffix;
+		for(int i = 0; i < 33; i++)
+			all_suffix.push_back(Regex::transfer(infix[i]));
+		for(int i = 0; i < 21; i++)
+			all_suffix.push_back(suffix[i]);
+		int id = 19;
+		tmp1 = create(all_suffix, id);
+		all_suffix.clear();
+
+		// 3. merge the manually-NFA and the automically-NFA
+		merge(nfa, tmp1, id);
+		delete tmp1;
+
+		// 4. return the final large NFA
 		return nfa;
 	}
 

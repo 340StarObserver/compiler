@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	09 November 2016
-Modified 	: 	11 November 2016
+Modified 	: 	12 November 2016
 Version 	: 	1.0
 */
 
@@ -40,6 +40,7 @@ namespace Seven
 		/* deconstructor */
 		~NFA();
 
+
 		/* get the start node */
 		FANode * getStart()const;
 
@@ -52,6 +53,7 @@ namespace Seven
 		/* set the end node */
 		void setEnd(FANode * node);
 
+
 		/* do closure-change( NFA to NFA* ) on a NFA */
 		static void closure(NFA * nfa, int start_id);
 
@@ -61,11 +63,15 @@ namespace Seven
 		/* join two NFAs by '.' */
 		static void join(NFA * left, NFA * right);
 
-		/* create a NFA by given a suffix regex */
+
+		/* create a NFA by one suffix regex */
 		static NFA * create(const string & suffixRegex, int & start_id);
 
-		/* create a big NFA by given all the suffix regex */
-		static NFA * create(const vector<string> & suffixs);
+		/* create a big NFA by more than one suffix regex */
+		static NFA * create(const vector<string> & suffixs, int & start_id);
+
+		/* create a big NFA by some default regex */
+		static NFA * create();
 	};
 }
 

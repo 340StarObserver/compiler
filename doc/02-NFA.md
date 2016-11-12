@@ -107,13 +107,18 @@
                 FANode * _end;  
             
             public :  
-                /* 根据终结符vt，构造一个简单NFA */  
-                /* 参数start_id是这个NFA中的结点的起始编号，因为NFA会不断变换合并，所以需要通过参数来显示指明编号 */  
-                NFA(int vt, int start_id);  
-                
+            
                 /* 析构这个NFA */  
                 /* 通过广度优先方式遍历这个图（注意有环，需要验重），把所有结点加入到一个数组中，遍历结束后释放数组中所有结点 */  
                 ~NFA();  
+                
+                
+                
+                // 下面的四个函数对应上文说的四种基本操作  
+                
+                /* 根据终结符vt，构造一个简单NFA */  
+                /* 参数start_id是这个NFA中的结点的起始编号，因为NFA会不断变换合并，所以需要通过参数来显示指明编号 */  
+                NFA(int vt, int start_id);  
                 
                 /* 根据终结符'*'，对一个NFA进行闭包变换 */  
                 /* 在变换的时候会引入两个新的结点，所以到指明新结点的起始编号 */  
@@ -128,6 +133,20 @@
                 /* 在连接的时候不会引入新的结点 */  
                 /* 注意，把第二个NFA合并到第一个中，原来第二个NFA里的指针置空以节约内存 */  
                 static void join(NFA * left, NFA * right);  
+                
+                
+                
+                // 下面的三个函数是利用上面的四个函数，来做的一些封装，好让用户用的更方便  
+                
+                /* 构造一个NFA，by 单独的一个后缀正则表达式 */  
+                /* 注意，参数start_id是引用传递，方便构造下一个NFA的时候知道结点编号应该从什么值开始 */  
+                static NFA * create(const string & suffixRegex, int & start_id);  
+                
+                /* 构造一个大NFA，by 多个后缀正则表达式 */  
+                static NFA * create(const vector<string> & suffixs);  
+                
+                /* 构造一个大NFA，by 默认的一些正则表达式 */  
+                static NFA * create();  
         };  
 
 

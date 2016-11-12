@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	09 November 2016
-Modified 	: 	11 November 2016
+Modified 	: 	12 November 2016
 Version 	: 	1.0
 */
 
@@ -270,16 +270,26 @@ void test_6()
 	// prepare some suffix regexs
 	vector<string> regexs;
 	regexs.push_back(Regex::transfer("(a|b)*.c"));
-	regexs.push_back(Regex::transfer("a*"));
-	regexs.push_back(Regex::transfer("d|e"));
+	regexs.push_back(Regex::transfer("a.b**.c"));
+	regexs.push_back(Regex::transfer("d|e|f"));
 
 	// create a big NFA
-	NFA * nfa = NFA::create(regexs);
+	int start_id = 1;
+	NFA * nfa = NFA::create(regexs, start_id);
 
 	// print NFA
 	traverse(*nfa);
 
 	// delete
+	delete nfa;
+}
+
+
+/* test build a big NFA by default regexs */
+void test_7()
+{
+	NFA * nfa = NFA::create();
+	traverse(*nfa);
 	delete nfa;
 }
 
@@ -291,6 +301,7 @@ int main()
 	// test_3();
 	// test_4();
 	// test_5();
-	test_6();
+	// test_6();
+	test_7();
 	return 0;
 }
