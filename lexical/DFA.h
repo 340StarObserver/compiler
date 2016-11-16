@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	14 November 2016
-Modified 	: 	15 November 2016
+Modified 	: 	16 November 2016
 Version 	: 	1.0
 */
 
@@ -21,7 +21,7 @@ namespace Seven
 	/* DFA */
 	class DFA
 	{
-	public:
+	private:
 		/* extract all nodes from a NFA */
 		/*
 		1. Eg. a NFA has 7 nodes, their id is 1~7
@@ -64,13 +64,64 @@ namespace Seven
 		static set<int> goTo(FANode ** nodes, const set<int> & C, int vt);
 
 
-		/* judge whether a state-set already exist */
+		/* judge whether a state-set already exist, if exist return the index, else -1 */
 		/*
 		Eg. Clist=[{1,2,4},{3,5,6}]
 		      C={1,2,4} already exist in Clist
 		      C={1,3,5} not exist in Clist
 		*/
-		static bool exist_state(const vector< set<int> > & Clist, const set<int> & C);
+		static int find_state(const vector< set<int> > & Clist, const set<int> & C);
+
+
+		/* judge whether a state-set can become a end state of DFA */
+		/*
+		parameters :
+			'C' is a set such as {1,3,5}
+			'end_id' is the end node's id of the original NFA
+		*/
+		static bool isEnd(const set<int> & C, int end_id);
+
+	private:
+		/* private constructor */
+		DFA();
+
+		/* private set vts */
+		void setVts(int * vts, int vtNum);
+
+		/* private set endMark */
+		void setEndMark(bool * endMark);
+
+	private:
+		/* the number of vt */
+		int _vtNum;
+
+		/* the vts */
+		int * _vts;
+
+		/* the state transfer table */
+		vector<int *> _table;
+
+		/* mark each state is or not a end state */
+		bool * _endMark;
+
+	public:
+		/* deconstructor */
+		~DFA();
+
+		/* get the number of vt */
+		int getVtNum()const;
+
+		/* get the vts */
+		int * getVts()const;
+
+		/* get state transfer table */
+		vector<int *> * getTable();
+
+		/* get mark[] which represent each state is or not a end state */
+		bool * getEndMark()const;
+
+		/* create a DFA from a NFA */
+		static DFA * create(const NFA * nfa);
 	};
 }
 

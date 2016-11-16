@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	14 November 2016
-Modified 	: 	15 November 2016
+Modified 	: 	16 November 2016
 Version 	: 	1.0
 */
 
@@ -207,12 +207,12 @@ namespace Seven
 	}
 
 
-	/* judge whether a state-set already exist */
-	bool DFA::exist_state(const vector< set<int> > & Clist, const set<int> & C)
+	/* judge whether a state-set already exist, if exist return the index, else -1 */
+	int DFA::find_state(const vector< set<int> > & Clist, const set<int> & C)
 	{
 		bool w;
-		size_t n = Clist.size();
-		for(size_t i = 0; i < n; i++){
+		int n = Clist.size();
+		for(int i = 0; i < n; i++){
 			// compare Clist[i] and C
 			w = true;
 			if(Clist[i].size() != C.size())
@@ -226,9 +226,162 @@ namespace Seven
 				}
 			}
 			if(w == true)
-				return true;
+				return i;
 		}
-		return false;
+		return -1;
+	}
+
+
+	/* judge whether a state-set can become a end state of DFA */
+	bool DFA::isEnd(const set<int> & C, int end_id)
+	{
+		// if C contains end_id, it can be a end state of DFA
+		return C.find(end_id) != C.end();
+	}
+
+
+	/* private constructor */
+	DFA::DFA()
+	{
+		_vtNum = 0;
+		_vts = NULL;
+		_endMark = NULL;
+	}
+
+
+	/* private set vts */
+	void DFA::setVts(int * vts, int vtNum)
+	{
+		_vts = vts;
+		_vtNum = vtNum;
+	}
+
+
+	/* private set endMark */
+	void DFA::setEndMark(bool * endMark)
+	{
+		_endMark = endMark;
+	}
+
+
+	/* get state transfer table */
+	vector<int *> * DFA::getTable()
+	{
+		return &_table;
+	}
+
+
+	/* get the number of vt */
+	int DFA::getVtNum()const
+	{
+		return _vtNum;
+	}
+
+
+	/* get the vts */
+	int * DFA::getVts()const
+	{
+		return _vts;
+	}
+
+
+	/* get mark[] which represent each state is or not a end state */
+	bool * DFA::getEndMark()const
+	{
+		return _endMark;
+	}
+
+
+	/* deconstructor */
+	DFA::~DFA()
+	{
+		// delete _endMark
+		if(_endMark != NULL)
+			delete []_endMark;
+
+		// delete _vts
+		delete []_vts;
+
+		// delete _table
+		size_t n = _table.size();
+		for(size_t i = 0; i < n; i++){
+			if(_table[i] != NULL)
+				delete []_table[i];
+		}
+		_table.clear();
+	}
+
+
+	/* create a DFA from a NFA */
+	DFA * DFA::create(const NFA * nfa)
+	{
+		// 1. create a result DFA
+		DFA * dfa = new DFA();
+
+		// 2. get all nodes of NFA
+		int num_node = 0;
+		FANode ** nodes = extract_nodes(nfa, num_node);
+
+		// 3. get all vts of NFA
+		int num_vt = 0;
+		int * vts = extract_vts(nfa, num_vt);
+		dfa->setVts(vts, num_vt);
+
+		// 4. prepare some objects
+		vector< set<int> > Clist;
+		queue< set<int> > Q;
+		set<int> cur, tmp;
+		int i = 1, p, k, j;
+
+		// 5. calculate ε-closure(NFA's start node), and put it to Clist and Q
+		cur.insert(nfa->getStart()->getId());
+		tmp = closure(nodes, cur);
+		dfa->getTable()->push_back(new int[num_vt]);
+		Clist.push_back(tmp);
+		Q.push(tmp);
+
+		// 6. do BFS
+		while(Q.empty() == false){
+			// pop a item
+			cur = Q.front();
+			Q.pop();
+			p = find_state(Clist, cur);
+
+			// consider each vt
+			for(k = 0; k < num_vt; k++){
+				// calculate ε-closure(goto(cur,vt))
+				tmp = closure(nodes, goTo(nodes, cur, vts[k]));
+
+				if(tmp.size() == 0){
+					// if tmp is ∅
+					dfa->getTable()->at(p)[k] = -1;
+				}else if((j = find_state(Clist, tmp)) != -1){
+					// if tmp is in Clist
+					dfa->getTable()->at(p)[k] = j;
+				}else{
+					// tmp is a new state-set
+					dfa->getTable()->at(p)[k] = i;
+					dfa->getTable()->push_back(new int[num_vt]);
+					Clist.push_back(tmp);
+					Q.push(tmp);
+					i++;
+				}
+			}
+		}
+
+		// 7. then calculate endMark[]
+		int dfa_state_num = dfa->getTable()->size();
+		bool * mark = new bool[dfa_state_num];
+		for(i = 0; i < dfa_state_num; i++)
+			mark[i] = isEnd(Clist[i], nfa->getEnd()->getId());
+		dfa->setEndMark(mark);
+
+		// 8. delete
+		delete []nodes;
+		Clist.clear();
+
+		// 9. return
+		return dfa;
 	}
 
 }
