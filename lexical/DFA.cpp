@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	14 November 2016
-Modified 	: 	16 November 2016
+Modified 	: 	17 November 2016
 Version 	: 	1.0
 */
 
@@ -300,7 +300,8 @@ namespace Seven
 			delete []_endMark;
 
 		// delete _vts
-		delete []_vts;
+		if(_vts != NULL)
+			delete []_vts;
 
 		// delete _table
 		size_t n = _table.size();

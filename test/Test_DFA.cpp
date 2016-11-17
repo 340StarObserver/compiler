@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	14 November 2016
-Modified 	: 	16 November 2016
+Modified 	: 	17 November 2016
 Version 	: 	1.0
 */
 
@@ -266,37 +266,86 @@ using std::cout;
 /* test DFA::create */
 void test_8(const string & infix)
 {
-	// 1. build a NFA
-	int start_id = 1;
+	// 1. calculate suffix regex
 	string suffix = Regex::transfer(infix);
 	cout<<"regex suffix : "<<suffix<<'\n';
+
+	// 2. build a NFA
+	int start_id = 1;
 	NFA * nfa = NFA::create(suffix, start_id);
 
-	// 2. build a DFA
+	// 3. build a DFA
 	DFA * dfa = DFA::create(nfa);
 
-	// 3. test print DFA
+	// 4. get DFA's vts
 	int num_vt = dfa->getVtNum();
+	int * vts = dfa->getVts();
+
+	// 5. get DFA's state-transfer-table
 	vector<int *> * table = dfa->getTable();
+
+	// 6. get DFA's state-end-mark[]
 	bool * mark = dfa->getEndMark();
 
+	// 7. print DFA, for example :
+	/*
+		the number of vt : 2
+
+		state transfer table :
+			a 	b
+		S0 	S1 	S2
+		S1 	S1 	S2
+		S2 	∅ 	S2
+
+		end mark[] :
+		0 	1 	1
+	*/
 	cout<<"the number of vt : "<<num_vt<<'\n';
+
 	cout<<"\nstate transfer table :\n\t";
 	for(int i = 0; i < num_vt; i++)
-		cout<<char(dfa->getVts()[i])<<'\t';
+		cout<<char(vts[i])<<'\t';
 	cout<<'\n';
+
 	for(int i = 0; i < table->size(); i++){
 		cout<<"I"<<i<<'\t';
 		for(int j = 0; j < num_vt; j++)
 			cout<<table->at(i)[j]<<'\t';
 		cout<<'\n';
 	}
+
 	cout<<"\nend mark[] :\n";
 	for(int i = 0; i < table->size(); i++)
 		cout<<mark[i]<<'\t';
 	cout<<'\n';
 
-	// 4. delete
+	// 8. delete
+	delete nfa;
+	delete dfa;
+}
+
+
+/* test a large DFA */
+void test_9()
+{
+	// 1. build a large NFA
+	NFA * nfa = NFA::create();
+
+	// 2. build a large DFA
+	DFA * dfa = DFA::create(nfa);
+
+	// 3. get DFA's vts
+	int num_vt = dfa->getVtNum();
+	int * vts = dfa->getVts();
+
+	// 4. get DFA's state-transfer-table
+	vector<int *> * table = dfa->getTable();
+
+	// 5. print some value
+	cout<<"the number of vts    : "<<num_vt<<'\n';
+	cout<<"the number of state : "<<table->size()<<'\n';
+
+	// 6. delete
 	delete nfa;
 	delete dfa;
 }
@@ -314,8 +363,10 @@ int main()
 
 	// test_8(string("a.(b.a.b*.a)*.(a|b).b*"));
 	// test_8(string("(a|b)*.a.(a|b).(a|b).(a|b)"));
-	// test_8(string("(a.b*.a)*.(a|b).b*"));
-	test_8(string("a.a*.((b.a.b*.a)*.(a|b).b*)*"));
+	test_8(string("(a.b*.a)*.(a|b).b*"));
+	// test_8(string("a.a*.((b.a.b*.a)*.(a|b).b*)*"));
+
+	// test_9();
 
 	return 0;
 }
