@@ -89,166 +89,8 @@ void traverse(const NFA & nfa){
 }
 
 
-/* test whether the nodes in a NFA( ab.c|*de|*. ) are right */
-void test_1()
-{
-	// manually build a NFA
-	NFA * nfa = new NFA(int('a'), 1);
-	FANode * origin_start = nfa->getStart();
-	FANode * origin_end = nfa->getEnd();
-
-	FANode * p3 = new FANode(3);
-	FANode * p4 = new FANode(4);
-	FANode * p5 = new FANode(5);
-	FANode * p6 = new FANode(6);
-	FANode * p7 = new FANode(7);
-	FANode * p8 = new FANode(8);
-	FANode * p9 = new FANode(9);
-	FANode * p10 = new FANode(10);
-	FANode * p11 = new FANode(11);
-	FANode * p12 = new FANode(12);
-	FANode * p13 = new FANode(13);
-	FANode * p14 = new FANode(14);
-	FANode * p15 = new FANode(15);
-	FANode * p16 = new FANode(16);
-	FANode * p17 = new FANode(17);
-	FANode * p18 = new FANode(18);
-
-	p7->addNext(FANode::NullEdge, origin_start);
-	origin_end->addNext(FANode::NullEdge, p3);
-	p3->addNext(int('b'), p4);
-	p4->addNext(FANode::NullEdge, p8);
-
-	p7->addNext(FANode::NullEdge, p5);
-	p5->addNext(int('c'), p6);
-	p6->addNext(FANode::NullEdge, p8);
-
-	p9->addNext(FANode::NullEdge, p7);
-	p9->addNext(FANode::NullEdge, p10);
-	p8->addNext(FANode::NullEdge, p7);
-	p8->addNext(FANode::NullEdge, p10);
-
-	p10->addNext(FANode::NullEdge, p17);
-	p17->addNext(FANode::NullEdge, p15);
-	p17->addNext(FANode::NullEdge, p18);
-	p15->addNext(FANode::NullEdge, p11);
-	p15->addNext(FANode::NullEdge, p13);
-	p11->addNext(int('d'), p12);
-	p13->addNext(int('e'), p14);
-	p12->addNext(FANode::NullEdge, p16);
-	p14->addNext(FANode::NullEdge, p16);
-	p16->addNext(FANode::NullEdge, p15);
-	p16->addNext(FANode::NullEdge, p18);
-
-	nfa->setStart(p9);
-	nfa->setEnd(p18);
-	p18->setTerminate(true);
-
-	// test print
-	traverse(*nfa);
-
-	// delete
-	delete nfa;
-}
-
-
-/* test do closure on a NFA */
-void test_2()
-{
-	// create a NFA
-	NFA * nfa = new NFA(int('a'), 1);
-	// do two closure
-	NFA::closure(nfa, 3);
-	NFA::closure(nfa, 5);
-	// test print
-	traverse(*nfa);
-	// delete
-	delete nfa;
-}
-
-
-/* test union NFAs by '|' */
-void test_3()
-{
-	// create NFA1
-	NFA * nfa_1 = new NFA(int('a'), 1);
-	NFA::closure(nfa_1, 3);
-
-	// create NFA2
-	NFA * nfa_2 = new NFA(int('b'), 5);
-	NFA::closure(nfa_2, 7);
-
-	// union NFA1 & NFA2
-	NFA::merge(nfa_1, nfa_2, 9);
-
-	// create NFA3
-	NFA * nfa_3 = new NFA(int('c'), 11);
-
-	// union (NFA1|NFA2) & NFA3
-	NFA::merge(nfa_1, nfa_3, 13);
-
-	// test print NFA1
-	cout<<"---- NFA1 ----\n";
-	traverse(*nfa_1);
-
-	// test print NFA2
-	cout<<"---- NFA2 ----\n";
-	traverse(*nfa_2);
-
-	// test print NFA3
-	cout<<"---- NFA3 ----\n";
-	traverse(*nfa_3);
-
-	// delete
-	delete nfa_1;
-	delete nfa_2;
-	delete nfa_3;
-}
-
-
-/* test join NFAs by '.' */
-void test_4()
-{
-	// create NFA1, NFA2
-	NFA * nfa_1 = new NFA(int('a'), 1);
-	NFA * nfa_2 = new NFA(int('b'), 3);
-	// do NFA1|NFA2
-	NFA::merge(nfa_1, nfa_2, 5);
-	// do (NFA1|NFA2)*
-	NFA::closure(nfa_1, 7);
-
-	// create NFA3
-	NFA * nfa_3 = new NFA(int('c'), 9);
-	// do NFA3*
-	NFA::closure(nfa_3, 11);
-
-	// create NFA4
-	NFA * nfa_4 = new NFA(int('d'), 13);
-
-	// do (NFA1|NFA2)*.NFA3*.NFA4
-	NFA::join(nfa_1, nfa_3);
-	NFA::join(nfa_1, nfa_4);
-
-	// test print
-	cout<<"---- NFA1 ----\n";
-	traverse(*nfa_1);
-	cout<<"---- NFA2 ----\n";
-	traverse(*nfa_2);
-	cout<<"---- NFA3 ----\n";
-	traverse(*nfa_3);
-	cout<<"---- NFA4 ----\n";
-	traverse(*nfa_4);
-
-	// delete
-	delete nfa_1;
-	delete nfa_2;
-	delete nfa_3;
-	delete nfa_4;
-}
-
-
 /* test build a NFA by given a suffix regex */
-void test_5()
+void test_1()
 {
 	// build a NFA
 	string suffix("ab.c|*de|*.");
@@ -265,7 +107,7 @@ void test_5()
 
 
 /* test build a big NFA by given several suffix regexs */
-void test_6()
+void test_2()
 {
 	// prepare some suffix regexs
 	vector<string> regexs;
@@ -286,9 +128,9 @@ void test_6()
 
 
 /* test build a big NFA by default regexs */
-void test_7()
+void test_3()
 {
-	NFA * nfa = NFA::create();
+	NFA * nfa = NFA::create("/home/seven/gitspace/compiler/conf/regex.conf");
 	traverse(*nfa);
 	delete nfa;
 }
@@ -298,10 +140,6 @@ int main()
 {
 	// test_1();
 	// test_2();
-	// test_3();
-	// test_4();
-	// test_5();
-	// test_6();
-	test_7();
+	test_3();
 	return 0;
 }

@@ -26,7 +26,10 @@ namespace Seven
 		FANode * _end; 	// the end node
 
 		/* used in deconstructor */
-		bool contains(const vector<FANode *> & pool, FANode * node)const;
+		static bool contains(const vector<FANode *> & pool, FANode * node);
+
+		/* read infix regex from a conf file */
+		static vector<string> readRegex(const char * path);
 	public:
 		/* constructor */
 		/*
@@ -70,8 +73,8 @@ namespace Seven
 		/* create a big NFA by more than one suffix regex */
 		static NFA * create(const vector<string> & suffixs, int & start_id);
 
-		/* create a big NFA by some default regex */
-		static NFA * create();
+		/* create a big NFA from conf file */
+		static NFA * create(const char * path);
 	};
 }
 

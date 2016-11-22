@@ -14,6 +14,9 @@ using std::queue;
 #include <stack>
 using std::stack;
 
+#include <fstream>
+using std::ifstream;
+
 namespace Seven
 {
 	/* constructor */
@@ -30,8 +33,9 @@ namespace Seven
 		_start->addNext(vt, _end);
 	}
 
+
 	/* used in deconstructor */
-	bool NFA::contains(const vector<FANode *> & pool, FANode * node)const
+	bool NFA::contains(const vector<FANode *> & pool, FANode * node)
 	{
 		size_t n = pool.size();
 		for(size_t i = 0; i < n; i++){
@@ -40,6 +44,7 @@ namespace Seven
 		}
 		return false;
 	}
+
 
 	/* deconstructor */
 	/*
@@ -84,11 +89,13 @@ namespace Seven
 		pool.clear();
 	}
 
+
 	/* get the start node */
 	FANode * NFA::getStart()const
 	{
 		return _start;
 	}
+
 
 	/* get the end node */
 	FANode * NFA::getEnd()const
@@ -96,17 +103,20 @@ namespace Seven
 		return _end;
 	}
 
+
 	/* set the start node */
 	void NFA::setStart(FANode * node)
 	{
 		_start = node;
 	}
 
+
 	/* set the end node */
 	void NFA::setEnd(FANode * node)
 	{
 		_end = node;
 	}
+
 
 	/* do closure-change( NFA to NFA* ) on a NFA */
 	void NFA::closure(NFA * nfa, int start_id)
@@ -129,6 +139,7 @@ namespace Seven
 		nfa->setStart(s);
 		nfa->setEnd(e);
 	}
+
 
 	/* union two NFAs by a '|' */
 	/*
@@ -164,6 +175,7 @@ namespace Seven
 		right->setEnd(NULL);
 	}
 
+
 	/* join two NFAs by '.' */
 	/*
 	Tips :
@@ -188,6 +200,7 @@ namespace Seven
 		right->setStart(NULL);
 		right->setEnd(NULL);
 	}
+
 
 	/* create a NFA by given a suffix regex */
 	NFA * NFA::create(const string & suffixRegex, int & start_id)
@@ -241,6 +254,7 @@ namespace Seven
 		return S.top();
 	}
 
+
 	/* create a big NFA by given all the suffix regex */
 	NFA * NFA::create(const vector<string> & suffixs, int & start_id)
 	{
@@ -265,31 +279,30 @@ namespace Seven
 		return nfa;
 	}
 
-	/* create a big NFA by some default regex */
-	NFA * NFA::create()
+
+	/* read infix regex from a conf file */
+	vector<string> NFA::readRegex(const char * path)
 	{
-		// prepare some infix regexs
-		const static string infix[] = {
-			"(_|A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z).(0|1|2|3|4|5|6|7|8|9|_|A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)*",
-			"(\t| |\n).(\t| |\n)*",
-			"0|(1|2|3|4|5|6|7|8|9).(0|1|2|3|4|5|6|7|8|9)*",
-			"#. .i.n.c.l.u.d.e", "#. .i.f.n.d.e.f", "#. .d.e.f.i.n.e", "#. .e.n.d.i.f",
-			"m.a.i.n", "n.a.m.e.s.p.a.c.e", "u.s.i.n.g",
-			"c.l.a.s.s", "s.t.r.u.c.t", "u.n.i.o.n", "e.n.u.m",
-			"p.r.i.v.a.t.e", "p.u.b.l.i.c", "s.t.a.t.i.c", "c.o.n.s.t",
-			"v.o.i.d", "b.o.o.l", "c.h.a.r", "i.n.t", "l.o.n.g", "f.l.o.a.t", "d.o.u.b.l.e",
-			":.:", "~",
-			"r.e.t.u.r.n", "i.f", "e.l.s.e", "d.o", "w.h.i.l.e", "f.o.r"
-		};
+		// open file
+		ifstream in(path);
 
-		// prepare some suffix regexs
-		const static string suffix[] = {
-			"{", "}", "(", ")", ";",
-			"+", "-", "/", "+=.", "-=.", "/=.",
-			"&", "^", "&&.", "!",
-			"=", ">", "<", "==.", ">=.", "<=."
-		};
+		// get all regexs
+		vector<string> res;
+		string tmp;
+		while(getline(in, tmp)){
+			res.push_back(tmp);
+		}
+		res.push_back("(\t| |\n).(\t| |\n)*");
 
+		// close file
+		in.close();
+		return res;
+	}
+
+
+	/* create a big NFA from conf file */
+	NFA * NFA::create(const char * path)
+	{
 		// 1. create a NFA with *  *=  |  ||
 		/*
 			because in a normal suffix regex, it includes '*', '.', '|'
@@ -318,14 +331,15 @@ namespace Seven
 		/*
 			those rest regexs can be created automically
 		*/
-		vector<string> all_suffix;
-		for(int i = 0; i < 33; i++)
-			all_suffix.push_back(Regex::transfer(infix[i]));
-		for(int i = 0; i < 21; i++)
-			all_suffix.push_back(suffix[i]);
+		vector<string> regexs = readRegex(path);
+		int n = regexs.size();
+		for(int i = 0; i < n; i++)
+			regexs[i] = Regex::transfer(regexs[i]);
+		regexs.push_back("(");
+		regexs.push_back(")");
 		int id = 19;
-		tmp1 = create(all_suffix, id);
-		all_suffix.clear();
+		tmp1 = create(regexs, id);
+		regexs.clear();
 
 		// 3. merge the manually-NFA and the automically-NFA
 		merge(nfa, tmp1, id);
