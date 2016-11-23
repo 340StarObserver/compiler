@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	14 November 2016
-Modified 	: 	17 November 2016
+Modified 	: 	23 November 2016
 Version 	: 	1.0
 */
 
@@ -33,7 +33,7 @@ void print_DFA(DFA * dfa)
 	vector<int *> * table = dfa->getTable();
 
 	// 3. get DFA's state-end-mark[]
-	bool * mark = dfa->getEndMark();
+	int * types = dfa->getEndTypes();
 
 	// 4. print DFA, for example :
 	/*
@@ -62,9 +62,9 @@ void print_DFA(DFA * dfa)
 		cout<<'\n';
 	}
 
-	cout<<"\nend mark[] :\n";
+	cout<<"\nend types[] :\n";
 	for(int i = 0; i < table->size(); i++)
-		cout<<mark[i]<<'\t';
+		cout<<types[i]<<'\t';
 	cout<<'\n';
 }
 
@@ -78,7 +78,7 @@ void test_1(const string & infix)
 
 	// 2. build a NFA
 	int start_id = 1;
-	NFA * nfa = NFA::create(suffix, start_id);
+	NFA * nfa = NFA::create(suffix, 10, start_id);
 
 	// 3. build a DFA
 	DFA * dfa = DFA::create(nfa);
@@ -98,12 +98,15 @@ void test_2()
 	// prepare some suffix regexs
 	vector<string> regexs;
 	regexs.push_back(Regex::transfer("(a|b)*.c"));
-	regexs.push_back(Regex::transfer("a.b**.c"));
-	regexs.push_back(Regex::transfer("d|e|f"));
+	regexs.push_back(Regex::transfer("(b|c)*.a"));
+
+	vector<int> types;
+	types.push_back(20);
+	types.push_back(23);
 
 	// create a NFA
 	int start_id = 1;
-	NFA * nfa = NFA::create(regexs, start_id);
+	NFA * nfa = NFA::create(regexs, types, start_id);
 
 	// create a DFA
 	DFA * dfa = DFA::create(nfa);
@@ -150,7 +153,7 @@ int main()
 	// test_1(string("(a.b*.a)*.(a|b).b*"));
 	// test_1(string("a.a*.((b.a.b*.a)*.(a|b).b*)*"));
 
-	// test_2();
-	test_3();
+	test_2();
+	// test_3();
 	return 0;
 }

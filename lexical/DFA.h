@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	14 November 2016
-Modified 	: 	16 November 2016
+Modified 	: 	23 November 2016
 Version 	: 	1.0
 */
 
@@ -72,15 +72,6 @@ namespace Seven
 		*/
 		static int find_state(const vector< set<int> > & Clist, const set<int> & C);
 
-
-		/* judge whether a state-set can become a end state of DFA */
-		/*
-		parameters :
-			'C' is a set such as {1,3,5}
-			'end_id' is the end node's id of the original NFA
-		*/
-		static bool isEnd(const set<int> & C, int end_id);
-
 	private:
 		/* private constructor */
 		DFA();
@@ -88,8 +79,8 @@ namespace Seven
 		/* private set vts */
 		void setVts(int * vts, int vtNum);
 
-		/* private set endMark */
-		void setEndMark(bool * endMark);
+		/* private set types */
+		void setEndTypes(int * types);
 
 	private:
 		/* the number of vt */
@@ -101,8 +92,8 @@ namespace Seven
 		/* the state transfer table */
 		vector<int *> _table;
 
-		/* mark each state is or not a end state */
-		bool * _endMark;
+		/* mark each state's type */
+		int * _types;
 
 	public:
 		/* deconstructor */
@@ -117,8 +108,8 @@ namespace Seven
 		/* get state transfer table */
 		vector<int *> * getTable();
 
-		/* get mark[] which represent each state is or not a end state */
-		bool * getEndMark()const;
+		/* get type[] which represent each state's type */
+		int * getEndTypes()const;
 
 		/* create a DFA from a NFA */
 		static DFA * create(const NFA * nfa);

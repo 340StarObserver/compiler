@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	09 November 2016
-Modified 	: 	11 November 2016
+Modified 	: 	22 November 2016
 Version 	: 	1.0
 */
 
@@ -20,9 +20,9 @@ namespace Seven
 		/* id of this node */
 		int _id;
 
-		/* whether this node is terminate state */
-		/* this item only used in DFA */
-		bool _terminate;
+		/* regex type when this node is a end node */
+		/* 0 represent it is not a end node */
+		int _type;
 
 		/* Vt of each edge */
 		/* -1 represent a null edge */
@@ -43,11 +43,11 @@ namespace Seven
 		/* get the id */
 		int getId()const;
 
-		/* get whether this node is terminate state */
-		bool isTerminate()const;
+		/* get regex type when this node is a end node */
+		int getType()const;
 
-		/* set whether this node is terminate state */
-		void setTerminate(bool terminate);
+		/* set regex type when this node is a end node */
+		void setType(int type);
 
 		/* get Vt of each edge */
 		vector<int> * getEdges();

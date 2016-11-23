@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	09 November 2016
-Modified 	: 	12 November 2016
+Modified 	: 	22 November 2016
 Version 	: 	1.0
 */
 
@@ -30,14 +30,14 @@ using std::cout;
 void show(FANode & node)
 {
 	cout<<"this node itself :\n";
-	cout<<'\t'<<(void *)&node<<'\t'<<node.getId()<<'\t'<<node.isTerminate()<<'\n';
+	cout<<'\t'<<(void *)&node<<'\t'<<node.getId()<<'\t'<<node.getType()<<'\n';
 	cout<<"next nodes :\n";
 	size_t n = node.getEdges()->size();
 	for(size_t i = 0; i < n; i++){
 		cout<<'\t'<<(void *)(node.getNexts()->at(i))<<'\t';
-		cout<<node.getNexts()->at(i)->getId()<<'\t';
-		cout<<node.getNexts()->at(i)->isTerminate()<<'\t';
-		cout<<node.getEdges()->at(i)<<'\n';
+		cout<<"id : "<<node.getNexts()->at(i)->getId()<<"\t\t";
+		cout<<"type : "<<node.getNexts()->at(i)->getType()<<'\t';
+		cout<<"edge : "<<node.getEdges()->at(i)<<'\n';
 	}
 	cout<<'\n';
 }
@@ -95,7 +95,7 @@ void test_1()
 	// build a NFA
 	string suffix("ab.c|*de|*.");
 	int start_id = 1;
-	NFA * nfa = NFA::create(suffix, start_id);
+	NFA * nfa = NFA::create(suffix, 10, start_id);
 
 	// print NFA
 	traverse(*nfa);
@@ -115,11 +115,17 @@ void test_2()
 	regexs.push_back(Regex::transfer("a.b**.c"));
 	regexs.push_back(Regex::transfer("d|e|f"));
 
+	vector<int> types;
+	types.push_back(10);
+	types.push_back(20);
+	types.push_back(30);
+
 	// create a big NFA
 	int start_id = 1;
-	NFA * nfa = NFA::create(regexs, start_id);
+	NFA * nfa = NFA::create(regexs, types, start_id);
 
 	// print NFA
+	cout<<"start_id : "<<start_id<<'\n';
 	traverse(*nfa);
 
 	// delete
@@ -138,8 +144,8 @@ void test_3()
 
 int main()
 {
-	// test_1();
+	test_1();
 	// test_2();
-	test_3();
+	// test_3();
 	return 0;
 }

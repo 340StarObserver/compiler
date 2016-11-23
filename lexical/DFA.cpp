@@ -1,17 +1,22 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	14 November 2016
-Modified 	: 	17 November 2016
+Modified 	: 	23 November 2016
 Version 	: 	1.0
 */
 
 #include "DFA.h"
+#include "RegexType.h"
 
 #include <cstring>
 using std::memset;
 
 #include <queue>
 using std::queue;
+
+#include <algorithm>
+using std::set_intersection;
+using std::inserter;
 
 namespace Seven
 {
@@ -232,20 +237,12 @@ namespace Seven
 	}
 
 
-	/* judge whether a state-set can become a end state of DFA */
-	bool DFA::isEnd(const set<int> & C, int end_id)
-	{
-		// if C contains end_id, it can be a end state of DFA
-		return C.find(end_id) != C.end();
-	}
-
-
 	/* private constructor */
 	DFA::DFA()
 	{
 		_vtNum = 0;
 		_vts = NULL;
-		_endMark = NULL;
+		_types = NULL;
 	}
 
 
@@ -257,10 +254,10 @@ namespace Seven
 	}
 
 
-	/* private set endMark */
-	void DFA::setEndMark(bool * endMark)
+	/* private set types */
+	void DFA::setEndTypes(int * types)
 	{
-		_endMark = endMark;
+		_types = types;
 	}
 
 
@@ -285,19 +282,19 @@ namespace Seven
 	}
 
 
-	/* get mark[] which represent each state is or not a end state */
-	bool * DFA::getEndMark()const
+	/* get type[] which represent each state's type */
+	int * DFA::getEndTypes()const
 	{
-		return _endMark;
+		return _types;
 	}
 
 
 	/* deconstructor */
 	DFA::~DFA()
 	{
-		// delete _endMark
-		if(_endMark != NULL)
-			delete []_endMark;
+		// delete _types
+		if(_types != NULL)
+			delete []_types;
 
 		// delete _vts
 		if(_vts != NULL)
@@ -370,12 +367,46 @@ namespace Seven
 			}
 		}
 
-		// 7. then calculate endMark[]
+		// 7. then calculate types[]
+
+		/* prepare space for types[] */
 		int dfa_state_num = dfa->getTable()->size();
-		bool * mark = new bool[dfa_state_num];
-		for(i = 0; i < dfa_state_num; i++)
-			mark[i] = isEnd(Clist[i], nfa->getEnd()->getId());
-		dfa->setEndMark(mark);
+		int * types = new int[dfa_state_num];
+
+		/* prepare set A, A is all small NFA's end node's id */
+		set<int> A;
+		for(i = 1; i <= num_node; i++){
+			if(nodes[i]->getType() != 0)
+				A.insert(i);
+		}
+
+		/* for each Clist[i] */
+		for(i = 0; i < dfa_state_num; i++){
+			/* T = Clist[i] ∩ A */
+			set<int> T;
+			set_intersection(
+				Clist[i].begin(), Clist[i].end(), A.begin(), A.end(), 
+				inserter(T, T.begin())
+			);
+
+			if(T.size() == 0){
+				/* if T is ∅, then types[i] = 0 */
+				types[i] = 0;
+			}else{
+				/* types[i] = T中优先级最高的那种类型 */
+				int best_priority = 0, best_type, tmp_priority, tmp_type;
+				for(set<int>::iterator it = T.begin(); it != T.end(); ++it){
+					tmp_type = nodes[*it]->getType();
+					tmp_priority = RegexType::priority(tmp_type);
+					if(best_priority < tmp_priority){
+						best_type = tmp_type;
+						best_priority = tmp_priority;
+					}
+				}
+				types[i] = best_type;
+			}
+		}
+		dfa->setEndTypes(types);
 
 		// 8. delete
 		delete []nodes;

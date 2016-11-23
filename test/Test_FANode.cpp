@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	09 November 2016
-Modified 	: 	09 November 2016
+Modified 	: 	22 November 2016
 Version 	: 	1.0
 */
 
@@ -17,13 +17,14 @@ using std::cout;
 void show(FANode & node)
 {
 	cout<<"this node itself :\n";
-	cout<<'\t'<<(void *)&node<<'\t'<<node.getId()<<'\t'<<node.isTerminate()<<"\n\n";
+	cout<<'\t'<<(void *)&node<<'\t'<<node.getId()<<'\t'<<node.getType()<<"\n\n";
 	cout<<"next nodes :\n";
 	size_t n = node.getEdges()->size();
 	for(size_t i = 0; i < n; i++){
-		cout<<'\t'<<(void *)(node.getNexts()->at(i))<<'\t';
+		cout<<'\t'<<"edge : "<<node.getEdges()->at(i)<<'\t';
+		cout<<(void *)(node.getNexts()->at(i))<<'\t';
 		cout<<node.getNexts()->at(i)->getId()<<'\t';
-		cout<<node.getNexts()->at(i)->isTerminate()<<'\n';
+		cout<<node.getNexts()->at(i)->getType()<<'\n';
 	}
 }
 
@@ -31,12 +32,15 @@ int main()
 {
 	/* create some nodes */
 	FANode * p1 = new FANode(1);
+
 	FANode p2(2);
-	p2.setTerminate(true);
+	p2.setType(1);
+
 	FANode p3(3);
-	p3.setTerminate(false);
+	p3.setType(2);
+
 	FANode p4(4);
-	p4.setTerminate(true);
+	p4.setType(3);
 
 	/* link those nodes */
 	p1->addNext(int('a'), &p2);

@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	09 November 2016
-Modified 	: 	11 November 2016
+Modified 	: 	22 November 2016
 Version 	: 	1.0
 */
 
@@ -13,7 +13,7 @@ namespace Seven
 	FANode::FANode(int id)
 	{
 		_id = id;
-		_terminate = false;
+		_type = 0;
 	}
 
 	/* deconstructor */
@@ -29,16 +29,16 @@ namespace Seven
 		return _id;
 	}
 
-	/* get whether this node is terminate state */
-	bool FANode::isTerminate()const
+	/* get regex type when this node is a end node */
+	int FANode::getType()const
 	{
-		return _terminate;
+		return _type;
 	}
 
-	/* set whether this node is terminate state */
-	void FANode::setTerminate(bool terminate)
+	/* set regex type when this node is a end node */
+	void FANode::setType(int type)
 	{
-		_terminate = terminate;
+		_type = type;
 	}
 
 	/* get Vt of each edge */

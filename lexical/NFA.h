@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	09 November 2016
-Modified 	: 	12 November 2016
+Modified 	: 	22 November 2016
 Version 	: 	1.0
 */
 
@@ -29,7 +29,7 @@ namespace Seven
 		static bool contains(const vector<FANode *> & pool, FANode * node);
 
 		/* read infix regex from a conf file */
-		static vector<string> readRegex(const char * path);
+		static void readRegex(const char * path, vector<string> & regexs, vector<int> & types);
 	public:
 		/* constructor */
 		/*
@@ -68,10 +68,16 @@ namespace Seven
 
 
 		/* create a NFA by one suffix regex */
-		static NFA * create(const string & suffixRegex, int & start_id);
+		/*
+		parameter :
+			suffixRegex 	: 	suffix string of a regex
+			type 		: 	regex type(Id or Whitespace or ...)
+			start_id 	: 	the beginning id of node
+		*/
+		static NFA * create(const string & suffixRegex, int type, int & start_id);
 
 		/* create a big NFA by more than one suffix regex */
-		static NFA * create(const vector<string> & suffixs, int & start_id);
+		static NFA * create(const vector<string> & suffixs, const vector<int> & types, int & start_id);
 
 		/* create a big NFA from conf file */
 		static NFA * create(const char * path);

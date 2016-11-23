@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	09 November 2016
-Modified 	: 	12 November 2016
+Modified 	: 	22 November 2016
 Version 	: 	1.0
 */
 
@@ -203,7 +203,7 @@ namespace Seven
 
 
 	/* create a NFA by given a suffix regex */
-	NFA * NFA::create(const string & suffixRegex, int & start_id)
+	NFA * NFA::create(const string & suffixRegex, int type, int & start_id)
 	{
 		// create a work stack
 		stack<NFA *> S;
@@ -251,12 +251,15 @@ namespace Seven
 		}
 
 		// the top item in stack is the final NFA
-		return S.top();
+		// set the end node's type
+		NFA * res = S.top();
+		res->getEnd()->setType(type);
+		return res;
 	}
 
 
 	/* create a big NFA by given all the suffix regex */
-	NFA * NFA::create(const vector<string> & suffixs, int & start_id)
+	NFA * NFA::create(const vector<string> & suffixs, const vector<int> & types, int & start_id)
 	{
 		// if there is no suffix regex
 		size_t n = suffixs.size();
@@ -264,12 +267,12 @@ namespace Seven
 			return NULL;
 
 		// create the first NFA
-		NFA * nfa = create(suffixs[0], start_id);
+		NFA * nfa = create(suffixs[0], types[0], start_id);
 
 		// merge the 'nfa' with other NFAs
 		NFA * tmp = NULL;
 		for(size_t i = 1; i < n; i++){
-			tmp = create(suffixs[i], start_id);
+			tmp = create(suffixs[i], types[i], start_id);
 			NFA::merge(nfa, tmp, start_id);
 			delete tmp;
 			start_id += 2;
@@ -281,22 +284,25 @@ namespace Seven
 
 
 	/* read infix regex from a conf file */
-	vector<string> NFA::readRegex(const char * path)
+	void NFA::readRegex(const char * path, vector<string> & regexs, vector<int> & types)
 	{
 		// open file
 		ifstream in(path);
 
 		// get all regexs
-		vector<string> res;
 		string tmp;
-		while(getline(in, tmp)){
-			res.push_back(tmp);
+		int type;
+		while(in >> type){
+			getline(in, tmp);
+			tmp = tmp.substr(1, tmp.length() - 1);
+			regexs.push_back(tmp);
+			types.push_back(type);
 		}
-		res.push_back("(\t| |\n).(\t| |\n)*");
+		regexs.push_back("(\t| |\n).(\t| |\n)*");
+		types.push_back(2);
 
 		// close file
 		in.close();
-		return res;
 	}
 
 
@@ -310,19 +316,27 @@ namespace Seven
 			so, I have to create it manually
 		*/
 		NFA * nfa = NULL, * tmp1 = NULL, * tmp2 = NULL;
+
 		nfa = new NFA(int('*'), 1);
+		nfa->getEnd()->setType(11);
+
 		tmp1 = new NFA(int('*'), 3);
 		tmp2 = new NFA(int('='), 5);
 		join(tmp1, tmp2);
+		tmp1->getEnd()->setType(15);
 		delete tmp2;
 		merge(nfa, tmp1, 7);
 		delete tmp1;
+
 		tmp1 = new NFA('|', 9);
+		tmp1->getEnd()->setType(18);
 		merge(nfa, tmp1, 11);
 		delete tmp1;
+
 		tmp1 = new NFA('|', 13);
 		tmp2 = new NFA('|', 15);
 		join(tmp1, tmp2);
+		tmp1->getEnd()->setType(21);
 		delete tmp2;
 		merge(nfa, tmp1, 17);
 		delete tmp1;
@@ -331,14 +345,21 @@ namespace Seven
 		/*
 			those rest regexs can be created automically
 		*/
-		vector<string> regexs = readRegex(path);
+		vector<string> regexs;
+		vector<int> types;
+		readRegex(path, regexs, types);
+
 		int n = regexs.size();
 		for(int i = 0; i < n; i++)
 			regexs[i] = Regex::transfer(regexs[i]);
+
 		regexs.push_back("(");
 		regexs.push_back(")");
+		types.push_back(6);
+		types.push_back(7);
+
 		int id = 19;
-		tmp1 = create(regexs, id);
+		tmp1 = create(regexs, types, id);
 		regexs.clear();
 
 		// 3. merge the manually-NFA and the automically-NFA

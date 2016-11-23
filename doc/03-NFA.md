@@ -62,7 +62,29 @@
 
 
 
-### 三. NFA结点类（FANode）的设计 ###
+### 三. 各种正则的类型类（RegexType）的设计 ###
+
+        class RegexType  
+        {  
+            public :  
+                /* 为每种词素给出一个能够代表意思的字符串记号 */  
+                static char * represent(int type)  
+                {  
+                    if( type == 1 )  
+                        return "id";  // 标识符  
+                    ...  
+                }  
+                
+                
+                /* 为每种词素定一个优先级（值越大，优先级越高） */  
+                /* 为何要有优先级？ */  
+                /* 比如int，它满足标识符的要求，也是保留字，只有规定保留字优先级高，int才会被解释成保留字 */  
+                static int priority(int type);  
+        };  
+
+
+
+### 四. NFA结点类（FANode）的设计 ###
 
         // NFA的结点 与 DFA的结点中的内容并无不同，所以都用FANode就行  
 
@@ -72,8 +94,9 @@
                 /* 此结点的编号 */  
                 int _id;  
                 
-                /* 此结点是否是终结状态（只在DFA中派用场） */  
-                bool _terminate;  
+                /* 以此结点为终结结点的NFA，对应的词素的类型 */  
+                /* 若该结点不是终结结点，则此值为零 */  
+                int _type;  
                 
                 /* 此结点的各发出边上的终结符 */  
                 /* 本来终结符是char类型的，这里用int表示，是为了能够用 -1 来表示ε边 */  
@@ -95,7 +118,7 @@
 
 
 
-### 四. NFA类的设计 ###
+### 五. NFA类的设计 ###
 
         class NFA  
         {  
@@ -139,19 +162,22 @@
                 // 下面的三个函数是利用上面的四个函数，来做的一些封装，好让用户用的更方便  
                 
                 /* 构造一个NFA，by 单独的一个后缀正则表达式 */  
-                /* 注意，参数start_id是引用传递，方便构造下一个NFA的时候知道结点编号应该从什么值开始 */  
-                static NFA * create(const string & suffixRegex, int & start_id);  
+                /* 参数 type 是该正则对应的词素的类型 */  
+                /* 参数 start_id 是引用传递，方便构造下一个NFA的时候知道结点编号应该从什么值开始 */  
+                static NFA * create(const string & suffixRegex, int type, int & start_id);  
                 
                 /* 构造一个大NFA，by 多个后缀正则表达式 */  
-                static NFA * create(const vector<string> & suffixs);  
+                /* 参数 suffixs 是多种词素的后缀正则 */  
+                /* 参数 types   是这些词素各自的类型 */  
+                static NFA * create(const vector<string> & suffixs, const vector<int> & types, int & start_id);  
                 
                 /* 构造一个大NFA，by 默认的一些正则表达式 */  
-                static NFA * create();  
+                static NFA * create(const char * path);  
         };  
 
 
 
-### 五. 由后缀正则构造NFA的算法 ###
+### 六. 由后缀正则构造NFA的算法 ###
 
         在上文中，我们分析并设计了NFA的四种基本操作 :  
         {  
@@ -199,10 +225,11 @@
             }  
             
             此时，栈顶的元素就是最终的NFA  
+            设置一下这个NFA的终结结点的_type字段  
 
 
 
-### 六.　根据多个后缀正则构造NFA的算法 ###
+### 七.　根据多个后缀正则构造NFA的算法 ###
 
         我们知道，单单把一个后缀正则转化为NFA是不够的  
         我们需要把所有正则的NFA合并成一个大的NFA，然后才能执行确定化的操作使之变换为DFA  
