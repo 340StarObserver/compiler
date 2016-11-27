@@ -28,7 +28,7 @@
                 table   是DFA的状态转化表  
                 vt_num  是终结符的总个数，即table中的每一行的列数  
                 U       是当前的等价划分  
-                index   是我想对 U[index] 进行拆分  
+                index   是我想对 U[index] 进行分析和拆分  
         
         返回值解释 :  
                 当需要对 U[index] 进行进一步拆分 :  
@@ -39,11 +39,11 @@
                     return false  
         */  
         bool split( const vector<int *> & table, int vt_num,  
-                    vector<set<int>> & U,        int index )  
+                    vector<set<int>> & U       , int index )  
         {  
             vector<int> next;                  // 准备邻接状态表  
             
-            for(i = 0; i < vt_num; i++)        // 对第i个终结符做分析，看U[index]是否需要进一步拆分  
+            for(i = 0; i < vt_num; i++)        // 对第i个终结符做分析，看U[index]在该终结符的作用下，是否需要进一步拆分  
             {  
                 对于U[index]中的每个元素e :  
                     e_next = table[e][i];      // table[e][i]是在原本DFA中，状态e在第i个终结符下的后继状态  
@@ -80,7 +80,7 @@
         U.push_back(A);  
         U.push_back(B);  
         // 创建一个初始划分  
-        // 这个初始划分中，一开始仅仅包含终结太集合&非终结态集合  
+        // 这个初始划分中，一开始仅仅包含终结态集合A & 非终结态集合B  
         
         int ori_size;  
         int cur_size = U.size();  
@@ -146,9 +146,30 @@
         至此，得到了优化DFA的状态转换表  
         // 虽然我们可以根据这个状态转换表，来构建一个有向图，它会占用更少的内存  
         // 但是 ：  
-        // I . 有向图结构难以方便地做序列化和反序列化，即很难很明晰地持久化到磁盘上  
+        // I . 有向图结构难以方便地做序列化和反序列化，即不方便持久化到磁盘上  
         // II. 而数组容易进行持久化和恢复，即只需要计算一次，并存储到磁盘上，以后做词法分析时直接从磁盘上load这张表即可  
 
 
 
 ### 四. 算法流程 -- 第三块 -- 标记每个新的终结状态对应了哪种词素 ###
+
+        int num = U.size();  
+        // num 是优化后的DFA的状态数  
+        
+        int * new_types = new int[num];  
+        // 新的DFA的每个结点的（是否是终结结点，若是则它对应的正则的代号是多少）  
+        // new_types[i] == 0    <==>    新的状态i不是一个终结结点  
+        // new_types[i] != 0    <==>    新的状态i是一个终结结点，且它表示了对应的正则的代号  
+        
+        for( i = 0; i < num; i++)  
+        {  
+            if( U[i]这个状态等价类中，没有终结结点 )  
+                new_types[i] = 0;  
+            else  
+                new_types[i] = U[i]这个等价类中中优先级最高的正则代号  
+        }  
+        
+        // 至此，优化的DFA的充要信息便齐全了，它包括 :  
+        // 1. 终结符表  
+        // 2. 新的状态转换表  
+        // 3. 新的终结结点-正则类型 对应表  
