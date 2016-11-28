@@ -152,8 +152,9 @@ int main()
 	// test_1(string("(a|b)*.a.(a|b).(a|b).(a|b)"));
 	// test_1(string("(a.b*.a)*.(a|b).b*"));
 	// test_1(string("a.a*.((b.a.b*.a)*.(a|b).b*)*"));
+	test_1(string("((b.a*)*.a)*.(a|b)"));
 
-	test_2();
+	// test_2();
 	// test_3();
 	return 0;
 }
