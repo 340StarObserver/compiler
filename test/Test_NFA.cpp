@@ -14,6 +14,9 @@ using Seven::FANode;
 #include "../lexical/Regex.h"
 using Seven::Regex;
 
+#include "../lexical/RegexType.h"
+using Seven::RegexType;
+
 #include <queue>
 using std::queue;
 
@@ -139,6 +142,14 @@ void test_3()
 	NFA * nfa = NFA::create("/home/seven/gitspace/compiler/conf/regex.conf");
 	traverse(*nfa);
 	delete nfa;
+
+	for(int i = 1; i <= 58; i++){
+		cout<<"id       : "<<i<<'\n';
+		cout<<"priority : "<<RegexType::priority(i)<<'\n';
+		cout<<"mean     : "<<RegexType::Means[i]<<'\n';
+		cout<<"infix    : "<<RegexType::Infixs[i]<<'\n';
+		cout<<'\n';
+	}
 }
 
 

@@ -27,9 +27,7 @@ namespace Seven
 
 		/* used in deconstructor */
 		static bool contains(const vector<FANode *> & pool, FANode * node);
-
-		/* read infix regex from a conf file */
-		static void readRegex(const char * path, vector<string> & regexs, vector<int> & types);
+		
 	public:
 		/* constructor */
 		/*

@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	18 November 2016
-Modified 	: 	28 November 2016
+Modified 	: 	29 November 2016
 Version 	: 	1.0
 */
 
@@ -106,34 +106,72 @@ void test_2()
 /* test save a ODFA and load */
 void test_3()
 {
-	// 1. calculate suffix regex
-	string suffix = Regex::transfer(string("((b.a*)*.a)*.(a|b)"));
+	// prepare some pointers
+	NFA * nfa = NULL;
+	DFA * dfa = NULL;
+	ODFA * odfa = NULL;
 
-	// 2. build a NFA
-	int start_id = 1;
-	NFA * nfa = NFA::create(suffix, 10, start_id);
+	// try to load from file
+	const char * path = "odfa.dat";
+	odfa = ODFA::load(path);
 
-	// 3. build a DFA
+	if(odfa == NULL){
+		cout<<"load from file failed\n";
+
+		// calculate suffix regex
+		string suffix = Regex::transfer(string("((b.a*)*.a)*.(a|b)"));
+
+		// build a NFA
+		int start_id = 1;
+		NFA * nfa = NFA::create(suffix, 10, start_id);
+
+		// build a DFA
+		DFA * dfa = DFA::create(nfa);
+
+		// build a ODFA
+		odfa = ODFA::create(dfa);
+
+		// save to file
+		odfa->save(path);
+		cout<<"save to file success\n";
+	}
+	else{
+		cout<<"load from file success\n";
+		print(*odfa);
+	}
+
+	// delete 
+	if(nfa)
+		delete nfa;
+	if(dfa)
+		delete dfa;
+	if(odfa)
+		delete odfa;
+}
+
+
+/* test transfer a large DFA to ODFA */
+void test_4()
+{
+	// 1. build a large NFA
+	NFA * nfa = NFA::create("/home/seven/gitspace/compiler/conf/regex.conf");
+
+	// 2. build a large DFA
 	DFA * dfa = DFA::create(nfa);
 
-	// 4. build a ODFA
+	// 3. build a large ODFA
 	ODFA * odfa = ODFA::create(dfa);
-	cout<<"before :\n";
-	print(*odfa);
+	odfa->save("output.dat");
 
-	// 5. save odfa to file
-	odfa->save("odfa.dat");
-
-	// 6. load from file
-	ODFA * odfa_2 = ODFA::load("odfa.dat");
-	cout<<"\nafter :\n";
-	print(*odfa_2);
+	// print several term
+	cout << "state number : " << odfa->getStateNum() << '\n';
+	cout << "vt    number : " << odfa->getVtNum() << '\n';
+	cout << "entrance  : " << odfa->getEntranceState() << '\n';
 
 	// delete
 	delete nfa;
 	delete dfa;
 	delete odfa;
-	delete odfa_2;
 }
 
 
@@ -145,5 +183,6 @@ int main()
 	// test_1(string("a.a*.((b.a.b*.a)*.(a|b).b*)*"));
 	// test_2();
 	test_3();
+	// test_4();
 	return 0;
 }

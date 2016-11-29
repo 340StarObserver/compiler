@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	18 November 2016
-Modified 	: 	28 November 2016
+Modified 	: 	29 November 2016
 Version 	: 	1.0
 */
 
@@ -11,6 +11,7 @@ Version 	: 	1.0
 #include <fstream>
 using std::ifstream;
 using std::ofstream;
+using std::ios;
 
 namespace Seven
 {
@@ -406,7 +407,10 @@ namespace Seven
 		int vtNum, sNum, entrance, tmp;
 
 		// open file
-		ifstream in(path);
+		ifstream in;
+		in.open(path, ios::in);
+		if(in.is_open() == false)
+			return NULL;
 
 		// read vtNum, sNum, entrance
 		in >> vtNum >> sNum >> entrance;

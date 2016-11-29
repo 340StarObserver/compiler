@@ -7,15 +7,13 @@ Version 	: 	1.0
 
 #include "NFA.h"
 #include "Regex.h"
+#include "RegexType.h"
 
 #include <queue>
 using std::queue;
 
 #include <stack>
 using std::stack;
-
-#include <fstream>
-using std::ifstream;
 
 namespace Seven
 {
@@ -283,33 +281,13 @@ namespace Seven
 	}
 
 
-	/* read infix regex from a conf file */
-	void NFA::readRegex(const char * path, vector<string> & regexs, vector<int> & types)
-	{
-		// open file
-		ifstream in(path);
-
-		// get all regexs
-		string tmp;
-		int type;
-		while(in >> type){
-			getline(in, tmp);
-			tmp = tmp.substr(1, tmp.length() - 1);
-			regexs.push_back(tmp);
-			types.push_back(type);
-		}
-		regexs.push_back("(\t| |\n).(\t| |\n)*");
-		types.push_back(2);
-
-		// close file
-		in.close();
-	}
-
-
 	/* create a big NFA from conf file */
 	NFA * NFA::create(const char * path)
 	{
-		// 1. create a NFA with *  *=  |  ||
+		// 1. read most regexs(which can be be builded automically) from a conf file
+		RegexType::init(path);
+
+		// 2. create a NFA with *  *=  |  ||
 		/*
 			because in a normal suffix regex, it includes '*', '.', '|'
 			that is to say, it will cause collusion
@@ -341,32 +319,57 @@ namespace Seven
 		merge(nfa, tmp1, 17);
 		delete tmp1;
 		
-		// 2. create a NFA with the rest regexs
+		// 3. create a NFA with the rest regexs
 		/*
 			those rest regexs can be created automically
 		*/
 		vector<string> regexs;
 		vector<int> types;
-		readRegex(path, regexs, types);
 
-		int n = regexs.size();
-		for(int i = 0; i < n; i++)
-			regexs[i] = Regex::transfer(regexs[i]);
+		int n = RegexType::Infixs.size();
+		for(int i = 1; i < n; i++){
+			if(RegexType::priority(i) != 0){
+				regexs.push_back(Regex::transfer(RegexType::Infixs[i]));
+				types.push_back(i);
+			}
+		}
 
 		regexs.push_back("(");
 		regexs.push_back(")");
 		types.push_back(6);
 		types.push_back(7);
 
+		RegexType::Infixs[6] = string("(");
+		RegexType::Infixs[7] = string(")");
+		RegexType::Infixs[11] = string("*");
+		RegexType::Infixs[15] = string("*.=");
+		RegexType::Infixs[18] = string("|");
+		RegexType::Infixs[21] = string("|.|");
+
+		RegexType::Means[6] = string("LBrace");
+		RegexType::Means[7] = string("RBrace");
+		RegexType::Means[11] = string("multi");
+		RegexType::Means[15] = string("MULTI");
+		RegexType::Means[18] = string("BinOr");
+		RegexType::Means[21] = string("LogicOr");
+
+		RegexType::Prioritys[6] = 1;
+		RegexType::Prioritys[7] = 1;
+		RegexType::Prioritys[11] = 1;
+		RegexType::Prioritys[15] = 5;
+		RegexType::Prioritys[18] = 1;
+		RegexType::Prioritys[21] = 5;
+
 		int id = 19;
 		tmp1 = create(regexs, types, id);
 		regexs.clear();
+		types.clear();
 
-		// 3. merge the manually-NFA and the automically-NFA
+		// 4. merge the manually-NFA and the automically-NFA
 		merge(nfa, tmp1, id);
 		delete tmp1;
 
-		// 4. return the final large NFA
+		// 5. return the final large NFA
 		return nfa;
 	}
 
