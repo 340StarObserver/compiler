@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	18 November 2016
-Modified 	: 	28 November 2016
+Modified 	: 	30 November 2016
 Version 	: 	1.0
 */
 
@@ -9,6 +9,9 @@ Version 	: 	1.0
 #define _ODFA_H
 
 #include "DFA.h"
+
+#include <iostream>
+using std::ostream;
 
 namespace Seven
 {
@@ -107,6 +110,7 @@ namespace Seven
 		/* deconstructor */
 		~ODFA();
 
+
 		/* get the number of vt */
 		int getVtNum()const;
 
@@ -124,6 +128,7 @@ namespace Seven
 
 		/* get states' end-situation */
 		int * getEndTypes()const;
+
 
 		/* create a ODFA by given a DFA */
 		static ODFA * create(DFA * dfa);

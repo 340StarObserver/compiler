@@ -1,12 +1,12 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	14 November 2016
-Modified 	: 	23 November 2016
+Modified 	: 	01 December 2016
 Version 	: 	1.0
 */
 
 #include "DFA.h"
-#include "RegexType.h"
+#include "RegexConf.h"
 
 #include <cstring>
 using std::memset;
@@ -397,7 +397,7 @@ namespace Seven
 				int best_priority = 0, best_type, tmp_priority, tmp_type;
 				for(set<int>::iterator it = T.begin(); it != T.end(); ++it){
 					tmp_type = nodes[*it]->getType();
-					tmp_priority = RegexType::priority(tmp_type);
+					tmp_priority = RegexConf::Items[tmp_type - 1].priority;
 					if(best_priority < tmp_priority){
 						best_type = tmp_type;
 						best_priority = tmp_priority;

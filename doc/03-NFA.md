@@ -62,24 +62,29 @@
 
 
 
-### 三. 各种正则的类型类（RegexType）的设计 ###
+### 三. 各种正则的配置类（RegexConf）的设计 ###
 
-        class RegexType  
+        /* 一个正则配置项 */  
+        struct RegexConfItem  
+        {  
+            int id;             // 该正则的编号(从1开始)  
+            int priority;       // 该正则的优先级  
+            string mean;        // 该正则的含义  
+            string infix;       // 该正则的中缀表达式  
+            
+            // 为何要有优先级？  
+            // 比如int，它满足标识符的要求，也是保留字，只有规定保留字优先级高，int才会被解释成保留字  
+        };  
+
+        /* 正则配置 */  
+        class RegexConf  
         {  
             public :  
-                /* 为每种词素给出一个能够代表意思的字符串记号 */  
-                static char * represent(int type)  
-                {  
-                    if( type == 1 )  
-                        return "id";  // 标识符  
-                    ...  
-                }  
+                /* 静态配置项成员 */  
+                static vector<RegexConfItem> Items;  
                 
-                
-                /* 为每种词素定一个优先级（值越大，优先级越高） */  
-                /* 为何要有优先级？ */  
-                /* 比如int，它满足标识符的要求，也是保留字，只有规定保留字优先级高，int才会被解释成保留字 */  
-                static int priority(int type);  
+                /* 根据一个配置文件进行初始化 */  
+                static void init(const char * path);  
         };  
 
 
@@ -94,7 +99,7 @@
                 /* 此结点的编号 */  
                 int _id;  
                 
-                /* 以此结点为终结结点的NFA，对应的词素的类型 */  
+                /* 以此结点为终结结点的NFA，对应的词素的类型（即上面说的RegexItem中的id） */  
                 /* 若该结点不是终结结点，则此值为零 */  
                 int _type;  
                 
@@ -171,8 +176,8 @@
                 /* 参数 types   是这些词素各自的类型 */  
                 static NFA * create(const vector<string> & suffixs, const vector<int> & types, int & start_id);  
                 
-                /* 构造一个大NFA，by 默认的一些正则表达式 */  
-                static NFA * create(const char * path);  
+                /* 构造一个大NFA，by 默认的一些正则表达式（即RegexConf::init得到的） */  
+                static NFA * create();  
         };  
 
 

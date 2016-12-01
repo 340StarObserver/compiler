@@ -1,12 +1,12 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	18 November 2016
-Modified 	: 	29 November 2016
+Modified 	: 	01 December 2016
 Version 	: 	1.0
 */
 
 #include "ODFA.h"
-#include "RegexType.h"
+#include "RegexConf.h"
 
 #include <fstream>
 using std::ifstream;
@@ -243,7 +243,7 @@ namespace Seven
 			for(it = U[i].begin(); it != U[i].end(); ++it){
 				tmp_state = *it;
 				tmp_type = old_types[tmp_state];
-				tmp_priority = RegexType::priority(tmp_type);
+				tmp_priority = RegexConf::Items[tmp_type - 1].priority;
 
 				if(best_priority < tmp_priority){
 					new_types[i] = tmp_type;

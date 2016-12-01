@@ -50,6 +50,11 @@ namespace Seven
 	/* its algorithm is in "doc/01-SuffixRegex.md" */
 	string Regex::transfer(const string & infix)
 	{
+		if(infix.length() <= 1){
+			string res(infix);
+			return res;
+		}
+
 		stack<char> A;
 		stack<string> B;
 

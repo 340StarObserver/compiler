@@ -1,13 +1,13 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	09 November 2016
-Modified 	: 	22 November 2016
+Modified 	: 	01 December 2016
 Version 	: 	1.0
 */
 
 #include "NFA.h"
 #include "Regex.h"
-#include "RegexType.h"
+#include "RegexConf.h"
 
 #include <queue>
 using std::queue;
@@ -282,95 +282,23 @@ namespace Seven
 
 
 	/* create a big NFA from conf file */
-	NFA * NFA::create(const char * path)
+	/* make sure use RegexConf::init(path) before it */
+	NFA * NFA::create()
 	{
-		// 1. read most regexs(which can be be builded automically) from a conf file
-		RegexType::init(path);
-
-		// 2. create a NFA with *  *=  |  ||
-		/*
-			because in a normal suffix regex, it includes '*', '.', '|'
-			that is to say, it will cause collusion
-			so, I have to create it manually
-		*/
-		NFA * nfa = NULL, * tmp1 = NULL, * tmp2 = NULL;
-
-		nfa = new NFA(int('*'), 1);
-		nfa->getEnd()->setType(11);
-
-		tmp1 = new NFA(int('*'), 3);
-		tmp2 = new NFA(int('='), 5);
-		join(tmp1, tmp2);
-		tmp1->getEnd()->setType(15);
-		delete tmp2;
-		merge(nfa, tmp1, 7);
-		delete tmp1;
-
-		tmp1 = new NFA('|', 9);
-		tmp1->getEnd()->setType(18);
-		merge(nfa, tmp1, 11);
-		delete tmp1;
-
-		tmp1 = new NFA('|', 13);
-		tmp2 = new NFA('|', 15);
-		join(tmp1, tmp2);
-		tmp1->getEnd()->setType(21);
-		delete tmp2;
-		merge(nfa, tmp1, 17);
-		delete tmp1;
-		
-		// 3. create a NFA with the rest regexs
-		/*
-			those rest regexs can be created automically
-		*/
-		vector<string> regexs;
+		// 1. prepare some temp variables
+		vector<string> suffixs;
 		vector<int> types;
+		int start_id = 1;
 
-		int n = RegexType::Infixs.size();
-		for(int i = 1; i < n; i++){
-			if(RegexType::priority(i) != 0){
-				regexs.push_back(Regex::transfer(RegexType::Infixs[i]));
-				types.push_back(i);
-			}
+		// 2. fill suffixs[], types[]
+		size_t n = RegexConf::Items.size();
+		for(size_t i = 0; i < n; i++){
+			suffixs.push_back(Regex::transfer(RegexConf::Items[i].infix));
+			types.push_back(RegexConf::Items[i].id);
 		}
 
-		regexs.push_back("(");
-		regexs.push_back(")");
-		types.push_back(6);
-		types.push_back(7);
-
-		RegexType::Infixs[6] = string("(");
-		RegexType::Infixs[7] = string(")");
-		RegexType::Infixs[11] = string("*");
-		RegexType::Infixs[15] = string("*.=");
-		RegexType::Infixs[18] = string("|");
-		RegexType::Infixs[21] = string("|.|");
-
-		RegexType::Means[6] = string("LBrace");
-		RegexType::Means[7] = string("RBrace");
-		RegexType::Means[11] = string("multi");
-		RegexType::Means[15] = string("MULTI");
-		RegexType::Means[18] = string("BinOr");
-		RegexType::Means[21] = string("LogicOr");
-
-		RegexType::Prioritys[6] = 1;
-		RegexType::Prioritys[7] = 1;
-		RegexType::Prioritys[11] = 1;
-		RegexType::Prioritys[15] = 5;
-		RegexType::Prioritys[18] = 1;
-		RegexType::Prioritys[21] = 5;
-
-		int id = 19;
-		tmp1 = create(regexs, types, id);
-		regexs.clear();
-		types.clear();
-
-		// 4. merge the manually-NFA and the automically-NFA
-		merge(nfa, tmp1, id);
-		delete tmp1;
-
-		// 5. return the final large NFA
-		return nfa;
+		// 3. build NFA
+		return create(suffixs, types, start_id);
 	}
 
 }

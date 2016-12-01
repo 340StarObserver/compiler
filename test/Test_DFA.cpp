@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	14 November 2016
-Modified 	: 	23 November 2016
+Modified 	: 	01 December 2016
 Version 	: 	1.0
 */
 
@@ -9,9 +9,11 @@ Version 	: 	1.0
 
 #include "../lexical/DFA.h"
 #include "../lexical/Regex.h"
+#include "../lexical/RegexConf.h"
 using Seven::DFA;
 using Seven::NFA;
 using Seven::Regex;
+using Seven::RegexConf;
 
 #include <string>
 using std::string;
@@ -74,7 +76,7 @@ void test_1(const string & infix)
 {
 	// 1. calculate suffix regex
 	string suffix = Regex::transfer(infix);
-	cout<<"regex suffix : "<<suffix<<'\n';
+	cout << "regex suffix : " << suffix << '\n';
 
 	// 2. build a NFA
 	int start_id = 1;
@@ -98,11 +100,11 @@ void test_2()
 	// prepare some suffix regexs
 	vector<string> regexs;
 	regexs.push_back(Regex::transfer("(a|b)*.c"));
-	regexs.push_back(Regex::transfer("(b|c)*.a"));
+	regexs.push_back(Regex::transfer("a.b**.c"));
 
 	vector<int> types;
-	types.push_back(20);
-	types.push_back(23);
+	types.push_back(11);
+	types.push_back(12);
 
 	// create a NFA
 	int start_id = 1;
@@ -124,23 +126,15 @@ void test_2()
 void test_3()
 {
 	// 1. build a large NFA
-	NFA * nfa = NFA::create("/home/seven/gitspace/compiler/conf/regex.conf");
+	NFA * nfa = NFA::create();
 
 	// 2. build a large DFA
 	DFA * dfa = DFA::create(nfa);
 
-	// 3. get DFA's vts
-	int num_vt = dfa->getVtNum();
-	int * vts = dfa->getVts();
+	// 3. print DFA
+	print_DFA(dfa);
 
-	// 4. get DFA's state-transfer-table
-	vector<int *> * table = dfa->getTable();
-
-	// 5. print some value
-	cout<<"the number of vts    : "<<num_vt<<'\n';
-	cout<<"the number of state : "<<table->size()<<'\n';
-
-	// 6. delete
+	// 4. delete
 	delete nfa;
 	delete dfa;
 }
@@ -148,13 +142,15 @@ void test_3()
 
 int main()
 {
+	RegexConf::init("/home/seven/gitspace/compiler/conf/regex.conf");
+
 	// test_1(string("a.(b.a.b*.a)*.(a|b).b*"));
 	// test_1(string("(a|b)*.a.(a|b).(a|b).(a|b)"));
 	// test_1(string("(a.b*.a)*.(a|b).b*"));
 	// test_1(string("a.a*.((b.a.b*.a)*.(a|b).b*)*"));
-	test_1(string("((b.a*)*.a)*.(a|b)"));
+	// test_1(string("((b.a*)*.a)*.(a|b)"));
 
 	// test_2();
-	// test_3();
+	test_3();
 	return 0;
 }

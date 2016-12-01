@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	09 November 2016
-Modified 	: 	22 November 2016
+Modified 	: 	01 December 2016
 Version 	: 	1.0
 */
 
@@ -25,35 +25,9 @@ namespace Seven
 		FANode * _start; 	// the start node
 		FANode * _end; 	// the end node
 
+	private:
 		/* used in deconstructor */
 		static bool contains(const vector<FANode *> & pool, FANode * node);
-		
-	public:
-		/* constructor */
-		/*
-		build a NFA according to a Vt
-		Example :
-			vt = int('a'), start_id = 7
-			then it will create a NFA like 7------>8, its edge is 'a'
-		*/
-		NFA(int vt, int start_id);
-
-		/* deconstructor */
-		~NFA();
-
-
-		/* get the start node */
-		FANode * getStart()const;
-
-		/* get the end node */
-		FANode * getEnd()const;
-
-		/* set the start node */
-		void setStart(FANode * node);
-
-		/* set the end node */
-		void setEnd(FANode * node);
-
 
 		/* do closure-change( NFA to NFA* ) on a NFA */
 		static void closure(NFA * nfa, int start_id);
@@ -63,6 +37,32 @@ namespace Seven
 
 		/* join two NFAs by '.' */
 		static void join(NFA * left, NFA * right);
+
+	private:
+		/* constructor */
+		/*
+		build a NFA according to a Vt
+		Example :
+			vt = int('a'), start_id = 7
+			then it will create a NFA like 7------>8, its edge is 'a'
+		*/
+		NFA(int vt, int start_id);
+
+		/* set the start node */
+		void setStart(FANode * node);
+
+		/* set the end node */
+		void setEnd(FANode * node);
+		
+	public:
+		/* deconstructor */
+		~NFA();
+
+		/* get the start node */
+		FANode * getStart()const;
+
+		/* get the end node */
+		FANode * getEnd()const;
 
 
 		/* create a NFA by one suffix regex */
@@ -78,7 +78,8 @@ namespace Seven
 		static NFA * create(const vector<string> & suffixs, const vector<int> & types, int & start_id);
 
 		/* create a big NFA from conf file */
-		static NFA * create(const char * path);
+		/* make sure use RegexConf::init(path) before it */
+		static NFA * create();
 	};
 }
 

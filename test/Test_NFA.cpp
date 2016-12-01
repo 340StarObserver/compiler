@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	09 November 2016
-Modified 	: 	22 November 2016
+Modified 	: 	01 December 2016
 Version 	: 	1.0
 */
 
@@ -14,8 +14,8 @@ using Seven::FANode;
 #include "../lexical/Regex.h"
 using Seven::Regex;
 
-#include "../lexical/RegexType.h"
-using Seven::RegexType;
+#include "../lexical/RegexConf.h"
+using Seven::RegexConf;
 
 #include <queue>
 using std::queue;
@@ -116,12 +116,10 @@ void test_2()
 	vector<string> regexs;
 	regexs.push_back(Regex::transfer("(a|b)*.c"));
 	regexs.push_back(Regex::transfer("a.b**.c"));
-	regexs.push_back(Regex::transfer("d|e|f"));
 
 	vector<int> types;
 	types.push_back(10);
 	types.push_back(20);
-	types.push_back(30);
 
 	// create a big NFA
 	int start_id = 1;
@@ -139,24 +137,18 @@ void test_2()
 /* test build a big NFA by default regexs */
 void test_3()
 {
-	NFA * nfa = NFA::create("/home/seven/gitspace/compiler/conf/regex.conf");
+	RegexConf::init("/home/seven/gitspace/compiler/conf/regex.conf");
+	NFA * nfa = NFA::create();
+
 	traverse(*nfa);
 	delete nfa;
-
-	for(int i = 1; i <= 58; i++){
-		cout<<"id       : "<<i<<'\n';
-		cout<<"priority : "<<RegexType::priority(i)<<'\n';
-		cout<<"mean     : "<<RegexType::Means[i]<<'\n';
-		cout<<"infix    : "<<RegexType::Infixs[i]<<'\n';
-		cout<<'\n';
-	}
 }
 
 
 int main()
 {
-	test_1();
+	// test_1();
 	// test_2();
-	// test_3();
+	test_3();
 	return 0;
 }

@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	18 November 2016
-Modified 	: 	29 November 2016
+Modified 	: 	01 December 2016
 Version 	: 	1.0
 */
 
@@ -9,8 +9,10 @@ Version 	: 	1.0
 
 #include "../lexical/Regex.h"
 #include "../lexical/ODFA.h"
-using Seven::NFA;
+#include "../lexical/RegexConf.h"
+using Seven::RegexConf;
 using Seven::Regex;
+using Seven::NFA;
 using Seven::DFA;
 using Seven::ODFA;
 
@@ -80,8 +82,8 @@ void test_2()
 	regexs.push_back(Regex::transfer("(a|b)*.c"));
 	regexs.push_back(Regex::transfer("a.b**.c"));
 	vector<int> types;
-	types.push_back(20);
-	types.push_back(23);
+	types.push_back(11);
+	types.push_back(12);
 
 	// 2. create a NFA
 	int start_id = 1;
@@ -154,7 +156,7 @@ void test_3()
 void test_4()
 {
 	// 1. build a large NFA
-	NFA * nfa = NFA::create("/home/seven/gitspace/compiler/conf/regex.conf");
+	NFA * nfa = NFA::create();
 
 	// 2. build a large DFA
 	DFA * dfa = DFA::create(nfa);
@@ -177,12 +179,15 @@ void test_4()
 
 int main()
 {
-	// test_1(string("((b.a*)*.a)*.(a|b)"));
+	RegexConf::init("/home/seven/gitspace/compiler/conf/regex.conf");
+	
+	test_1(string("((b.a*)*.a)*.(a|b)"));
 	// test_1(string("(a.b*.a)*.(a|b).b*"));
 	// test_1(string("a.(b.a.b*.a)*.(a|b).b*"));
 	// test_1(string("a.a*.((b.a.b*.a)*.(a|b).b*)*"));
 	// test_2();
-	test_3();
+	// test_3();
 	// test_4();
+
 	return 0;
 }
