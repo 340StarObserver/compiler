@@ -53,6 +53,42 @@ namespace Seven
 
 
 	/*
+	把终结态集B按照终结状态对应的正规表达式来分成很多个小集合
+	拆分准则 :
+		1. 同一个小集合里的多个终结状态，它们对应的正规表达式是同一个
+		2. 不同小集合里的多个终结状态，它们对应的正规表达式不是同一个
+	为何如此 ?
+		两个终结状态S1,S2，尽管它们是弱等价的，但是对应不同的正规表达式，应该分离
+		否则会导致终结冲突
+	参数的解释 :
+		T 		T[i]==0  <==> state i is not a end node; T[i] != 0  <==> state i is a end node
+		B 		终结态集
+		bs 		to save 很多个小集合
+	*/
+	void ODFA::deal_ends(const int * T, const set<int> & B, vector< set<int> > & bs)
+	{
+		bs.clear();
+		for(set<int>::iterator it = B.begin(); it != B.end(); ++it){
+			int e = *it;
+			bool w = false;
+			for(size_t i = 0; i < bs.size(); i++){
+				int t = *(bs[i].begin());
+				if(T[e] == T[t]){
+					bs[i].insert(e);
+					w = true;
+					break;
+				}
+			}
+			if(w == false){
+				set<int> new_set;
+				new_set.insert(e);
+				bs.push_back(new_set);
+			}
+		}
+	}
+
+
+	/*
 	用来拆分状态集的函数
 	参数的解释 :
 		table 		是DFA的状态转化表
@@ -137,18 +173,23 @@ namespace Seven
 		vector<int *> * table = dfa->getTable();
 		init_split(dfa->getEndTypes(), table->size(), A, B);
 
-		// 2. 创建初始划分，一开始仅仅包含 非终结态集合A & 终结态集合B
+		// 2. 把终结态集B按照终结状态对应的正规表达式来分成很多个小集合
+		vector< set<int> > bs;
+		deal_ends(dfa->getEndTypes(), B, bs);
+
+		// 3. 创建初始划分
 		U.clear();
 		U.push_back(A);
-		U.push_back(B);
+		for(size_t k = 0; k < bs.size(); k++)
+			U.push_back(bs[k]);
 
-		// 3. ori_size 是每一轮迭代前的划分中的等价类的数目
+		// 4. ori_size 是每一轮迭代前的划分中的等价类的数目
 		//     cur_size 是每一轮迭代后的划分中的等价类的数目
 		int ori_size;
 		int cur_size = U.size();
 		int i;
 
-		// 4. do split
+		// 5. do split
 		//     当某次迭代完成后，发现划分中的等价类的数目没有发生变化
 		//     则说明所有的等价类都满足弱等价了，即可以结束了
 		do{
@@ -243,11 +284,13 @@ namespace Seven
 			for(it = U[i].begin(); it != U[i].end(); ++it){
 				tmp_state = *it;
 				tmp_type = old_types[tmp_state];
-				tmp_priority = RegexConf::Items[tmp_type - 1].priority;
 
-				if(best_priority < tmp_priority){
-					new_types[i] = tmp_type;
-					best_priority = tmp_priority;
+				if(tmp_type > 0){
+					tmp_priority = RegexConf::Items[tmp_type - 1].priority;
+					if(best_priority < tmp_priority){
+						new_types[i] = tmp_type;
+						best_priority = tmp_priority;
+					}
 				}
 			}
 		}

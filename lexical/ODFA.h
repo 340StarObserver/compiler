@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	18 November 2016
-Modified 	: 	30 November 2016
+Modified 	: 	01 December 2016
 Version 	: 	1.0
 */
 
@@ -28,6 +28,22 @@ namespace Seven
 			B 		to save 终结态集B
 		*/
 		static void init_split(const int * T, int n, set<int> & A, set<int> & B);
+
+
+		/*
+		把终结态集B按照终结状态对应的正规表达式来分成很多个小集合
+		拆分准则 :
+			1. 同一个小集合里的多个终结状态，它们对应的正规表达式是同一个
+			2. 不同小集合里的多个终结状态，它们对应的正规表达式不是同一个
+		为何如此 ?
+			两个终结状态S1,S2，尽管它们是弱等价的，但是对应不同的正规表达式，应该分离
+			否则会导致终结冲突
+		参数的解释 :
+			T 		T[i]==0  <==> state i is not a end node; T[i] != 0  <==> state i is a end node
+			B 		终结态集
+			bs 		to save 很多个小集合
+		*/
+		static void deal_ends(const int * T, const set<int> & B, vector< set<int> > & bs);
 
 
 		/*
