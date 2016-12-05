@@ -33,6 +33,7 @@ namespace Seven
 
 
 	/* used in deconstructor */
+	/* judge whether a node already exists in a pool */
 	bool NFA::contains(const vector<FANode *> & pool, FANode * node)
 	{
 		size_t n = pool.size();
@@ -200,7 +201,15 @@ namespace Seven
 	}
 
 
-	/* create a NFA by given a suffix regex */
+	/*
+	create a NFA by given a suffix rege
+	parameter :
+		suffixRegex 	: 	suffix string of a regex
+		type 		: 	regex type(Id or Whitespace or ...)
+		start_id 	: 	the beginning id of node
+	algorithm :
+		see in "doc/NFA.md"
+	*/
 	NFA * NFA::create(const string & suffixRegex, int type, int & start_id)
 	{
 		// create a work stack
@@ -216,6 +225,7 @@ namespace Seven
 		for(size_t i = 0; i < n; i++){
 			ch = suffixRegex[i];
 			if(ch == '*'){
+				// 遇到*，则对栈顶的NFA做闭包操作
 				nfa_1 = S.top();
 				S.pop();
 				NFA::closure(nfa_1, start_id);
@@ -223,6 +233,7 @@ namespace Seven
 				start_id += 2;
 			}
 			else if(ch == '|'){
+				// 遇到|，则把栈顶的两个NFA用或运算合并
 				nfa_1 = S.top();
 				S.pop();
 				nfa_2 = S.top();
@@ -233,6 +244,7 @@ namespace Seven
 				delete nfa_1;
 			}
 			else if(ch == '.'){
+				// 遇到.，则把栈顶的两个NFA用.连接起来
 				nfa_1 = S.top();
 				S.pop();
 				nfa_2 = S.top();
@@ -242,6 +254,7 @@ namespace Seven
 				delete nfa_1;
 			}
 			else{
+				// 遇到终结符，则构造两点一边的简单NFA，并压栈
 				nfa_1 = new NFA(int(ch), start_id);
 				S.push(nfa_1);
 				start_id += 2;

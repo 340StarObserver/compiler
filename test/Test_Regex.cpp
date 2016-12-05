@@ -21,6 +21,7 @@ using std::string;
 #include <vector>
 using std::vector;
 
+// 测试把配置文件定义的中缀正规表达式转化为后缀
 void test_1()
 {
 	const char * path = "/home/seven/gitspace/compiler/conf/regex.conf";
@@ -33,9 +34,14 @@ void test_1()
 	}
 }
 
+// 着重测试各运算符之间的优先级是否在转化过程中被正确使用
 void test_2()
 {
 	string str;
+
+	str = "a.a*.((b.a.b*.a)*.(a|b).b*)*";
+	cout<<"infix  : "<<str<<'\n';
+	cout<<"suffix : "<<Regex::transfer(str)<<'\n'<<'\n';
 
 	str = "a|b|c";
 	cout<<"infix  : "<<str<<'\n';
@@ -66,10 +72,6 @@ void test_2()
 	cout<<"suffix : "<<Regex::transfer(str)<<'\n'<<'\n';
 
 	str = "a.(b|c)";
-	cout<<"infix  : "<<str<<'\n';
-	cout<<"suffix : "<<Regex::transfer(str)<<'\n'<<'\n';
-
-	str = "a.a*.((b.a.b*.a)*.(a|b).b*)*";
 	cout<<"infix  : "<<str<<'\n';
 	cout<<"suffix : "<<Regex::transfer(str)<<'\n'<<'\n';
 }

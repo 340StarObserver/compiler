@@ -497,4 +497,21 @@ namespace Seven
 		return res;
 	}
 
+
+	/*
+	扫描一段文本做词法分析
+	参数的解释 :
+		text 		待分析的文本
+		resOut 		分析结果的输出流( 建议输出到文件 )
+		errorOut 	报错的输出流( 建议输出到文件 )
+	结果输出流 :
+		每一行是 {"id" : 内码, "word" : 词语, "type" : 类型}
+	报错输出流 :
+		每一行是 {"line" : 行号, "offset" : 行内序号, "word" : 错误词语}
+	*/
+	void ODFA::scan(const string & text, ostream & resOut, ostream & errorOut)const
+	{
+
+	}
+
 }

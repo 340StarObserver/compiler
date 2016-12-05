@@ -47,14 +47,16 @@ namespace Seven
 	}
 
 	/* transfer a infix-regex into a suffix-regex */
-	/* its algorithm is in "doc/01-SuffixRegex.md" */
+	/* 算法的详细叙述见于 "doc/01-SuffixRegex.md" */
 	string Regex::transfer(const string & infix)
 	{
+		// 若原中缀的长度<=1，则原样返回
 		if(infix.length() <= 1){
 			string res(infix);
 			return res;
 		}
 
+		// 准备运算符栈A，后缀表达式栈B
 		stack<char> A;
 		stack<string> B;
 

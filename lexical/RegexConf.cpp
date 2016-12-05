@@ -35,6 +35,11 @@ namespace Seven
 
 			// read each line
 			while(in >> id >> pri >> mean){
+				/*
+				其中，id,pri是整数，mean是不带有空格的字符串，故三者直接读取即可
+				其中，infix是可能带有空格的字符串，故需要从mean的结尾处开始读完这一行剩下的全部字符
+				又因为mean和infix之间有一个空格隔开，故读取infix后需要丢弃开头的空格
+				*/
 				getline(in, infix);
 				infix = infix.substr(1, infix.length() - 1);
 
