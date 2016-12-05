@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	18 November 2016
-Modified 	: 	01 December 2016
+Modified 	: 	05 December 2016
 Version 	: 	1.0
 */
 
@@ -177,17 +177,46 @@ void test_4()
 }
 
 
+/* test ODFA::scan */
+void test_5()
+{
+	// 1. define paths
+	const char * path_input = "/home/seven/gitspace/compiler/bin/input.cpp";
+	const char * path_res = "/home/seven/gitspace/compiler/bin/res.log";
+	const char * path_error = "/home/seven/gitspace/compiler/bin/error.log";
+	const char * path_odfa = "/home/seven/gitspace/compiler/bin/odfa.dat";
+
+	// 2. build ODFA
+	ODFA * odfa = ODFA::load(path_odfa);
+	if(odfa == NULL){
+		NFA * nfa = NFA::create();
+		DFA * dfa = DFA::create(nfa);
+		odfa = ODFA::create(dfa);
+		odfa->save(path_odfa);
+		delete nfa;
+		delete dfa;
+	}
+
+	// 3. scan
+	odfa->scan(path_input, path_res, path_error);
+
+	// 4. delete
+	delete odfa;
+}
+
+
 int main()
 {
 	RegexConf::init("/home/seven/gitspace/compiler/conf/regex.conf");
 	
-	test_1(string("((b.a*)*.a)*.(a|b)"));
+	// test_1(string("((b.a*)*.a)*.(a|b)"));
 	// test_1(string("(a.b*.a)*.(a|b).b*"));
 	// test_1(string("a.(b.a.b*.a)*.(a|b).b*"));
 	// test_1(string("a.a*.((b.a.b*.a)*.(a|b).b*)*"));
 	// test_2();
 	// test_3();
 	// test_4();
+	test_5();
 	
 	return 0;
 }

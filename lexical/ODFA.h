@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	18 November 2016
-Modified 	: 	01 December 2016
+Modified 	: 	05 December 2016
 Version 	: 	1.0
 */
 
@@ -108,8 +108,40 @@ namespace Seven
 		static int * calc_types(DFA * dfa, const vector< set<int> > & U);
 
 	private:
+		/*
+		以json的方式, 记录一条结果日志
+		参数的解释 :
+			out 		输出流
+			id 		内码
+			word 		词语
+			type 		类型
+		*/
+		static void log_Res(ostream & out, size_t id, const string & word, const string & type);
+
+		/*
+		以json的方式, 记录一条报错日志
+		参数的解释 :
+			out 		输出流
+			line 		行号
+			offset 		行内序号
+			word 		错误词语
+		*/
+		static void log_Error(ostream & out, size_t line, size_t offset, const string & word);
+
+	private:
 		/* private constructor */
 		ODFA();
+
+		/*
+		go to the next node
+		参数的解释 :
+			curState 	the current state
+			vt 		the terminate symbol
+		返回值解释 :
+			the index of the next state
+			if failed, it will return -1
+		*/
+		int toNext(int curState, int vt)const;
 
 	private:
 		int _vtNum; 		// the number of vt
@@ -149,10 +181,10 @@ namespace Seven
 		/* create a ODFA by given a DFA */
 		static ODFA * create(DFA * dfa);
 
-		/* save this ODFA to a file */
+		/* save this ODFA to a file(recommend absoluate path) */
 		void save(const char * path)const;
 
-		/* load a ODFA from a file */
+		/* load a ODFA from a file(recommend absoluate path) */
 		static ODFA * load(const char * path);
 
 
@@ -168,6 +200,23 @@ namespace Seven
 			每一行是 {"line" : 行号, "offset" : 行内序号, "word" : 错误词语}
 		*/
 		void scan(const string & text, ostream & resOut, ostream & errorOut)const;
+
+		/*
+		扫描一个源代码文件做词法分析
+		参数的解释 :
+			path_input 	输入的源代码文件的路径
+			path_res 	输出的结果文件的路径
+			path_error 	输出的报错文件的路径
+			// 建议三者都使用绝对路径
+		*/
+		void scan(const char * path_input, const char * path_res, const char * path_error)const;
+
+		// 定义两个scan的考虑 :
+		// 1. 第一个scan方法更灵活
+		// 	待分析文本可以来自任何地方
+		// 	结果和报错也可以重定向到多种地方( 屏幕 or 文件 or 网络 )
+		// 2. 第二个scan方法更方便
+		// 	大多数使用场景，数据源和结果都是文件，故调用方便
 	};
 }
 

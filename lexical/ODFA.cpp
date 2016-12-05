@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	18 November 2016
-Modified 	: 	01 December 2016
+Modified 	: 	05 December 2016
 Version 	: 	1.0
 */
 
@@ -12,6 +12,11 @@ Version 	: 	1.0
 using std::ifstream;
 using std::ofstream;
 using std::ios;
+
+#include <sstream>
+using std::stringstream;
+
+#include <stdio.h>
 
 namespace Seven
 {
@@ -498,6 +503,100 @@ namespace Seven
 	}
 
 
+	/* 以json的方式, 记录一条结果日志 */
+	void ODFA::log_Res(ostream & out, size_t id, const string & word, const string & type)
+	{
+		// convert id to string
+		stringstream ss;
+		ss << id;
+
+		// build json
+		string json("{\"id\":");
+		json.append(ss.str()).append(",\"word\":\"").append(word).
+			append("\",\"type\":\"").append(type).append("\"}");
+
+		// output
+		out << json << '\n';
+	}
+
+
+	/* 以json的方式, 记录一条报错日志 */
+	void ODFA::log_Error(ostream & out, size_t line, size_t offset, const string & word)
+	{
+		// convert line to string
+		stringstream ss1;
+		ss1 << line;
+
+		// convert offset to string
+		stringstream ss2;
+		ss2 << offset;
+
+		// build json
+		string json("{\"line\":");
+		json.append(ss1.str()).append(",\"offset\":").
+			append(ss2.str()).append(",\"word\":\"").
+			append(word).append("\"}");
+
+		// output
+		out << json << '\n';
+	}
+
+
+	/*
+	go to the next node
+	参数的解释 :
+		curState 	the current state
+		vt 		the terminate symbol
+	返回值解释 :
+		the index of the next state
+		if failed, it will return -1
+	*/
+	int ODFA::toNext(int curState, int vt)const
+	{
+		if(curState >= 0 && curState < _sNum){
+			for(int i = 0; i < _vtNum; i++){
+				if(_vts[i] == vt)
+					return _tables[curState * _vtNum + i];
+			}
+		}
+		return -1;
+	}
+
+
+	/*
+	扫描一个源代码文件做词法分析
+	参数的解释 :
+		path_input 	输入的源代码文件的路径
+		path_res 	输出的结果文件的路径
+		path_error 	输出的报错文件的路径
+	*/
+	void ODFA::scan(const char * path_input, const char * path_res, const char * path_error)const
+	{
+		// 1. get code-text from input file
+		FILE * fb = fopen(path_input, "r");
+		fseek(fb, 0, SEEK_END);
+		size_t n = ftell(fb);
+		rewind(fb);
+		char * buffer = new char[n + 1];
+		fread(buffer, sizeof(char), n, fb);
+		buffer[n] = '\0';
+		fclose(fb);
+		string text(buffer);
+		delete []buffer;
+
+		// 2. prepare two output stream
+		ofstream out_res(path_res);
+		ofstream out_error(path_error);
+
+		// 3. scan
+		scan(text, out_res, out_error);
+
+		// 4. close output streams
+		out_res.close();
+		out_error.close();
+	}
+
+
 	/*
 	扫描一段文本做词法分析
 	参数的解释 :
@@ -508,10 +607,79 @@ namespace Seven
 		每一行是 {"id" : 内码, "word" : 词语, "type" : 类型}
 	报错输出流 :
 		每一行是 {"line" : 行号, "offset" : 行内序号, "word" : 错误词语}
+	算法见于"doc/06-Scan.md"
 	*/
 	void ODFA::scan(const string & text, ostream & resOut, ostream & errorOut)const
 	{
+		size_t cnt_line = 1; 		// 计数器-行号
+		size_t cnt_offset = 0; 		// 计数器-行内字符序号
+		size_t cnt_id = 0; 		// 计数器-内码
 
+		size_t p = 0; 			// 单词的起始位置
+		size_t q = 0; 			// 当前扫描位置
+		size_t N = text.length(); 	// 待分析文本的总长度
+
+		while(true)
+		{
+			// 当遇到空白符
+			while(q < N && (text[q] == ' ' || text[q] == '\t' || text[q] == '\n')){
+				if(text[q] == '\n'){
+					// 碰到换行符，则行号加一，行内字符序号清零
+					cnt_line++;
+					cnt_offset = 0;
+				}
+				else{
+					// 碰到空格或tab，则行内字符序号加一
+					cnt_offset++;
+				}
+				q++;
+			}
+
+			// 当到达文本末尾
+			if(q >= N)
+				return;
+
+			cnt_offset++; 	// 找到了一个单词的开始位置，行内字符序号加一
+			p = q; 		// 找到了一个单词的开始位置，用p记住它
+
+			// 从这个单词的开始位置，直至走到第一个终结结点
+			int curNode = _entrance;
+			do{
+				// 根据终结符text[q]，走到下一个结点上
+				curNode = toNext(curNode, int(text[q]));
+
+				// 走不通
+				if(curNode == -1){
+					log_Error(errorOut, cnt_line, cnt_offset, text.substr(p, q - p + 1));
+					break;
+				}
+
+				cnt_offset++;
+				q++;
+			}while(q < N && _types[curNode] == 0);
+
+			// 到达文本末尾，但是单词没有正常结束
+			if(curNode != -1 && _types[curNode] == 0){
+				log_Error(errorOut, cnt_line, cnt_offset - 1, text.substr(p, q - p));
+			}
+
+			// 从这个终结结点开始，继续走过连续的终结结点，直至走到一个非终结结点
+			if(curNode != -1 && _types[curNode] != 0){
+				// 用mark来标记真正的终结结点
+				int mark = curNode;
+
+				while(q < N){
+					curNode = toNext(curNode, int(text[q]));
+					if(curNode == -1 || _types[curNode] == 0)
+						break;
+					mark = curNode;
+					cnt_offset++;
+					q++;
+				}
+
+				log_Res(resOut, ++cnt_id, text.substr(p, q - p), RegexConf::Items[_types[mark] - 1].mean);
+			}
+		}
 	}
 
 }
