@@ -651,6 +651,8 @@ namespace Seven
 				// 走不通
 				if(curNode == -1){
 					log_Error(errorOut, cnt_line, cnt_offset, text.substr(p, q - p + 1));
+					cnt_offset = cnt_offset - 2;
+					q++;
 					break;
 				}
 
