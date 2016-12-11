@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	09 November 2016
-Modified 	: 	01 December 2016
+Modified 	: 	11 December 2016
 Version 	: 	1.0
 */
 
@@ -210,7 +210,7 @@ namespace Seven
 	algorithm :
 		see in "doc/NFA.md"
 	*/
-	NFA * NFA::create(const string & suffixRegex, int type, int & start_id)
+	NFA * NFA::create(const string & suffixRegex, int type, const string & mean, int & start_id)
 	{
 		// create a work stack
 		stack<NFA *> S;
@@ -262,15 +262,16 @@ namespace Seven
 		}
 
 		// the top item in stack is the final NFA
-		// set the end node's type
+		// set the end node's type and mean
 		NFA * res = S.top();
 		res->getEnd()->setType(type);
+		res->getEnd()->setMean(mean);
 		return res;
 	}
 
 
 	/* create a big NFA by given all the suffix regex */
-	NFA * NFA::create(const vector<string> & suffixs, const vector<int> & types, int & start_id)
+	NFA * NFA::create(const vector<string> & suffixs, const vector<int> & types, const vector<string> & means, int & start_id)
 	{
 		// if there is no suffix regex
 		size_t n = suffixs.size();
@@ -278,12 +279,12 @@ namespace Seven
 			return NULL;
 
 		// create the first NFA
-		NFA * nfa = create(suffixs[0], types[0], start_id);
+		NFA * nfa = create(suffixs[0], types[0], means[0], start_id);
 
 		// merge the 'nfa' with other NFAs
 		NFA * tmp = NULL;
 		for(size_t i = 1; i < n; i++){
-			tmp = create(suffixs[i], types[i], start_id);
+			tmp = create(suffixs[i], types[i], means[i], start_id);
 			NFA::merge(nfa, tmp, start_id);
 			delete tmp;
 			start_id += 2;
@@ -301,6 +302,7 @@ namespace Seven
 		// 1. prepare some temp variables
 		vector<string> suffixs;
 		vector<int> types;
+		vector<string> means;
 		int start_id = 1;
 
 		// 2. fill suffixs[], types[]
@@ -308,10 +310,11 @@ namespace Seven
 		for(size_t i = 0; i < n; i++){
 			suffixs.push_back(Regex::transfer(RegexConf::Items[i].infix));
 			types.push_back(RegexConf::Items[i].id);
+			means.push_back(RegexConf::Items[i].mean);
 		}
 
 		// 3. build NFA
-		return create(suffixs, types, start_id);
+		return create(suffixs, types, means, start_id);
 	}
 
 }

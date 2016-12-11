@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	09 November 2016
-Modified 	: 	01 December 2016
+Modified 	: 	11 December 2016
 Version 	: 	1.0
 */
 
@@ -33,13 +33,17 @@ using std::cout;
 void show(FANode & node)
 {
 	cout<<"this node itself :\n";
-	cout<<'\t'<<(void *)&node<<'\t'<<node.getId()<<'\t'<<node.getType()<<'\n';
+	cout<<'\t'<<(void *)&node<<'\t';
+	cout<<node.getId()<<'\t';
+	cout<<node.getType()<<'\t';
+	cout<<node.getMean()<<'\n';
 	cout<<"next nodes :\n";
 	size_t n = node.getEdges()->size();
 	for(size_t i = 0; i < n; i++){
 		cout<<'\t'<<(void *)(node.getNexts()->at(i))<<'\t';
 		cout<<"id : "<<node.getNexts()->at(i)->getId()<<"\t\t";
 		cout<<"type : "<<node.getNexts()->at(i)->getType()<<'\t';
+		cout<<"mean : "<<node.getNexts()->at(i)->getMean()<<'\t';
 		cout<<"edge : "<<node.getEdges()->at(i)<<'\n';
 	}
 	cout<<'\n';
@@ -98,7 +102,7 @@ void test_1()
 	// build a NFA
 	string suffix("ab.c|*de|*.");
 	int start_id = 1;
-	NFA * nfa = NFA::create(suffix, 10, start_id);
+	NFA * nfa = NFA::create(suffix, 10, "ID", start_id);
 
 	// print NFA
 	traverse(*nfa);
@@ -121,9 +125,13 @@ void test_2()
 	types.push_back(10);
 	types.push_back(20);
 
+	vector<string> means;
+	means.push_back("ID");
+	means.push_back("num");
+
 	// create a big NFA
 	int start_id = 1;
-	NFA * nfa = NFA::create(regexs, types, start_id);
+	NFA * nfa = NFA::create(regexs, types, means, start_id);
 
 	// print NFA
 	cout<<"start_id : "<<start_id<<'\n';

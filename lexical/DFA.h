@@ -16,6 +16,9 @@ using std::set;
 #include <vector>
 using std::vector;
 
+#include <string>
+using std::string;
+
 namespace Seven
 {
 	/* DFA */
@@ -92,8 +95,11 @@ namespace Seven
 		/* the state transfer table */
 		vector<int *> _table;
 
-		/* mark each state's type */
+		/* mark each state's end-type */
 		int * _types;
+
+		/* mark each state's end-mean */
+		string * _means;
 
 	public:
 		/* deconstructor */
@@ -108,8 +114,11 @@ namespace Seven
 		/* get state transfer table */
 		vector<int *> * getTable();
 
-		/* get type[] which represent each state's type */
+		/* get type[] which represent each state's end-type */
 		int * getEndTypes()const;
+
+		/* get mean[] which represent each state's end-mean */
+		string * getEndMeans()const;
 
 		/* create a DFA from a NFA */
 		static DFA * create(const NFA * nfa);

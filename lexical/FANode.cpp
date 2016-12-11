@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	09 November 2016
-Modified 	: 	22 November 2016
+Modified 	: 	11 December 2016
 Version 	: 	1.0
 */
 
@@ -39,6 +39,18 @@ namespace Seven
 	void FANode::setType(int type)
 	{
 		_type = type;
+	}
+
+	/* get regex mean when this node is a end node */
+	string FANode::getMean()const
+	{
+		return _mean;
+	}
+
+	/* set regex mean when this node is a end node */
+	void FANode::setMean(const string & mean)
+	{
+		_mean = mean;
 	}
 
 	/* get Vt of each edge */

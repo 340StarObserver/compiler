@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	09 November 2016
-Modified 	: 	22 November 2016
+Modified 	: 	11 December 2016
 Version 	: 	1.0
 */
 
@@ -10,6 +10,9 @@ Version 	: 	1.0
 
 #include <vector>
 using std::vector;
+
+#include <string>
+using std::string;
 
 namespace Seven
 {
@@ -23,6 +26,9 @@ namespace Seven
 		/* regex type when this node is a end node */
 		/* 0 represent it is not a end node */
 		int _type;
+
+		/* regex mean when this node is a end node */
+		string _mean;
 
 		/* Vt of each edge */
 		/* -1 represent a null edge */
@@ -48,6 +54,12 @@ namespace Seven
 
 		/* set regex type when this node is a end node */
 		void setType(int type);
+
+		/* get regex mean when this node is a end node */
+		string getMean()const;
+
+		/* set regex mean when this node is a end node */
+		void setMean(const string & mean);
 
 		/* get Vt of each edge */
 		vector<int> * getEdges();

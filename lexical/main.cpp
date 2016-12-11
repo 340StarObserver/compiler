@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	05 December 2016
-Modified 	: 	05 December 2016
+Modified 	: 	11 December 2016
 Version 	: 	1.0
 */
 
@@ -26,13 +26,15 @@ int main()
 	const char * path_res = "/home/seven/gitspace/compiler/bin/res.log";
 	const char * path_error = "/home/seven/gitspace/compiler/bin/error.log";
 
-	// 2. init regex's conf
-	RegexConf::init(path_conf);
-
-	// 3. load or build ODFA
+	// 2. try to load optimized-DFA
 	ODFA * odfa = ODFA::load(path_odfa);
+
+	// 3. if optimized-DFA not exist
 	if(odfa == NULL){
-		// if load failed, then build NFA, DFA, optimized-DFA
+		// read regex conf
+		RegexConf::init(path_conf);
+
+		// build NFA, DFA, optimized-DFA
 		NFA * nfa = NFA::create();
 		DFA * dfa = DFA::create(nfa);
 		odfa = ODFA::create(dfa);
@@ -46,6 +48,7 @@ int main()
 	}
 
 	// 4. scan a code file
+	//     logs with json format
 	odfa->scan(path_input, path_res, path_error);
 
 	// 5. delete

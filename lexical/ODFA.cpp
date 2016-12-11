@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	18 November 2016
-Modified 	: 	05 December 2016
+Modified 	: 	11 December 2016
 Version 	: 	1.0
 */
 
@@ -314,6 +314,7 @@ namespace Seven
 		_vts = NULL;
 		_tables = NULL;
 		_types = NULL;
+		_means = NULL;
 	}
 
 
@@ -326,6 +327,8 @@ namespace Seven
 			delete []_tables;
 		if(_types != NULL)
 			delete []_types;
+		if(_means != NULL)
+			delete []_means;
 	}
 
 
@@ -371,6 +374,13 @@ namespace Seven
 	}
 
 
+	/* get state's end-mean */
+	string * ODFA::getEndMeans()const
+	{
+		return _means;
+	}
+
+
 	/* create a ODFA by given a DFA */
 	ODFA * ODFA::create(DFA * dfa)
 	{
@@ -391,8 +401,13 @@ namespace Seven
 		int it_sNum = U.size();
 		int * it_tables = calc_table(dfa, U);
 
-		// 3. calculate the states' end-situation
+		// 3. calculate the states' end-type, end-mean
 		int * it_types = calc_types(dfa, U);
+		string * it_means = new string[it_sNum];
+		for(int i = 0; i < it_sNum; i++){
+			if(it_types[i] != 0)
+				it_means[i] = RegexConf::Items[it_types[i] - 1].mean;
+		}
 
 		// 4. calculate the new entrance state
 		int entrance;
@@ -411,6 +426,7 @@ namespace Seven
 		res->_vts = it_vts;
 		res->_tables = it_tables;
 		res->_types = it_types;
+		res->_means = it_means;
 
 		// 6. return
 		return res;
@@ -443,6 +459,11 @@ namespace Seven
 			out << _types[i] << '\t';
 		out << '\n';
 
+		// write means[]
+		for(int i = 0; i < _sNum; i++)
+			out << _means[i] << '\t';
+		out << '\n';
+
 		// close file
 		out.close();
 	}
@@ -453,6 +474,7 @@ namespace Seven
 	{
 		// prepare some variables
 		int vtNum, sNum, entrance, tmp;
+		string str;
 
 		// open file
 		ifstream in;
@@ -486,6 +508,15 @@ namespace Seven
 			types[i] = tmp;
 		}
 
+		// read means[]
+		string * means = new string[sNum];
+		for(int i = 0; i < sNum; i++){
+			if(types[i] != 0){
+				in >> str;
+				means[i] = str;
+			}
+		}
+
 		// close file
 		in.close();
 
@@ -497,6 +528,7 @@ namespace Seven
 		res->_vts = vts;
 		res->_tables = tables;
 		res->_types = types;
+		res->_means = means;
 
 		// return
 		return res;
@@ -679,7 +711,7 @@ namespace Seven
 					q++;
 				}
 
-				log_Res(resOut, ++cnt_id, text.substr(p, q - p), RegexConf::Items[_types[mark] - 1].mean);
+				log_Res(resOut, ++cnt_id, text.substr(p, q - p), _means[mark]);
 			}
 		}
 	}

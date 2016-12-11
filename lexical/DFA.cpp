@@ -243,6 +243,7 @@ namespace Seven
 		_vtNum = 0;
 		_vts = NULL;
 		_types = NULL;
+		_means = NULL;
 	}
 
 
@@ -289,12 +290,23 @@ namespace Seven
 	}
 
 
+	/* get mean[] which represent each state's end-mean */
+	string * DFA::getEndMeans()const
+	{
+		return _means;
+	}
+
+
 	/* deconstructor */
 	DFA::~DFA()
 	{
 		// delete _types
 		if(_types != NULL)
 			delete []_types;
+
+		// delete _means
+		if(_means != NULL)
+			delete []_means;
 
 		// delete _vts
 		if(_vts != NULL)
@@ -372,6 +384,7 @@ namespace Seven
 		/* prepare space for types[] */
 		int dfa_state_num = dfa->getTable()->size();
 		int * types = new int[dfa_state_num];
+		string * means = new string[dfa_state_num];
 
 		/* prepare set A, A is all small NFA's end node's id */
 		set<int> A;
@@ -404,9 +417,11 @@ namespace Seven
 					}
 				}
 				types[i] = best_type;
+				means[i] = RegexConf::Items[best_type - 1].mean;
 			}
 		}
 		dfa->setEndTypes(types);
+		dfa->_means = means;
 
 		// 8. delete
 		delete []nodes;

@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	09 November 2016
-Modified 	: 	01 December 2016
+Modified 	: 	11 December 2016
 Version 	: 	1.0
 */
 
@@ -70,12 +70,13 @@ namespace Seven
 		parameter :
 			suffixRegex 	: 	suffix string of a regex
 			type 		: 	regex type(Id or Whitespace or ...)
+			mean 		: 	regex mean
 			start_id 	: 	the beginning id of node
 		*/
-		static NFA * create(const string & suffixRegex, int type, int & start_id);
+		static NFA * create(const string & suffixRegex, int type, const string & mean, int & start_id);
 
 		/* create a big NFA by more than one suffix regex */
-		static NFA * create(const vector<string> & suffixs, const vector<int> & types, int & start_id);
+		static NFA * create(const vector<string> & suffixs, const vector<int> & types, const vector<string> & means, int & start_id);
 
 		/* create a big NFA from conf file */
 		/* make sure use RegexConf::init(path) before it */

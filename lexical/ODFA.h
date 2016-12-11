@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	18 November 2016
-Modified 	: 	05 December 2016
+Modified 	: 	11 December 2016
 Version 	: 	1.0
 */
 
@@ -150,7 +150,8 @@ namespace Seven
 		int _sNum; 		// the number of states
 		int * _tables; 		// the state-transfer-table
 
-		int * _types; 		// states' end-situation
+		int * _types; 		// states' end-type
+		string * _means; 	// states' end-mean
 
 		int _entrance; 		// the new entrance state
 
@@ -174,8 +175,11 @@ namespace Seven
 		/* get the state-transfer-table */
 		int * getTables()const;
 
-		/* get states' end-situation */
+		/* get states' end-type */
 		int * getEndTypes()const;
+
+		/* get state's end-mean */
+		string * getEndMeans()const;
 
 
 		/* create a ODFA by given a DFA */
