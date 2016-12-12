@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	14 November 2016
-Modified 	: 	01 December 2016
+Modified 	: 	12 December 2016
 Version 	: 	1.0
 */
 
@@ -13,10 +13,6 @@ using std::memset;
 
 #include <queue>
 using std::queue;
-
-#include <algorithm>
-using std::set_intersection;
-using std::inserter;
 
 namespace Seven
 {
@@ -397,10 +393,10 @@ namespace Seven
 		for(i = 0; i < dfa_state_num; i++){
 			/* T = Clist[i] ∩ A */
 			set<int> T;
-			set_intersection(
-				Clist[i].begin(), Clist[i].end(), A.begin(), A.end(), 
-				inserter(T, T.begin())
-			);
+			for(set<int>::iterator it = Clist[i].begin(); it != Clist[i].end(); ++it){
+				if(A.find(*it) != A.end())
+					T.insert(*it);
+			}
 
 			if(T.size() == 0){
 				/* if T is ∅, then types[i] = 0 */
