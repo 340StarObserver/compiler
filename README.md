@@ -40,6 +40,7 @@ I just want to experience what a compiler is.
         int main()  
         {  
         	// 1. define some paths  
+        	// 请在此处修改为你的路径  
         	const char * path_conf = "/home/seven/gitspace/compiler/conf/regex.conf";  
         	const char * path_odfa = "/home/seven/gitspace/compiler/bin/odfa.dat";  
         	const char * path_input = "/home/seven/gitspace/compiler/bin/input.cpp";  
@@ -76,3 +77,6 @@ I just want to experience what a compiler is.
         
         	return 0;  
         }  
+        
+        // 你可以通过执行 make_lexical.sh 来进行词法模块的编译和链接  
+        // 编译成功后，执行 ./bin/main_lexical.sh 试一试吧  
