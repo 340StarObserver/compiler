@@ -16,8 +16,6 @@ using std::ios;
 #include <sstream>
 using std::stringstream;
 
-#include <stdio.h>
-
 namespace Seven
 {
 	/*
@@ -605,16 +603,16 @@ namespace Seven
 	void ODFA::scan(const char * path_input, const char * path_res, const char * path_error)const
 	{
 		// 1. get code-text from input file
-		FILE * fb = fopen(path_input, "r");
-		fseek(fb, 0, SEEK_END);
-		size_t n = ftell(fb);
-		rewind(fb);
-		char * buffer = new char[n + 1];
-		fread(buffer, sizeof(char), n, fb);
-		buffer[n] = '\0';
-		fclose(fb);
-		string text(buffer);
-		delete []buffer;
+		string text, line;
+		ifstream in;
+		in.open(path_input, ios::in);
+		if(in.is_open()){
+			while(getline(in, line)){
+				text.append(line);
+				text.append("\n");
+			}
+			in.close();
+		}
 
 		// 2. prepare two output stream
 		ofstream out_res(path_res);
