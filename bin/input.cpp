@@ -19,10 +19,19 @@ int main()
 	int cnt = 1;
 	while(cnt <= 100){
 		sum += cnt;
+
 		if(cnt <= 50)
 			cnt = cnt + 2;
 		else
 			cnt = cnt + 1;
+
+		cnt = cnt * 2 / 2;
+		cnt *= 2;
+		cnt /= 2;
+
+		if(cnt >= 0 && (4 >= 3 || 5 <= 6)){
+			
+		}
 	}
 	return 0;
 }

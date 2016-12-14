@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	09 November 2016
-Modified 	: 	11 December 2016
+Modified 	: 	14 December 2016
 Version 	: 	1.0
 */
 
@@ -153,10 +153,27 @@ void test_3()
 }
 
 
+/* test build a NFA by a infix regex */
+void test_4()
+{
+	string suffix = Regex::transfer("(a|b)*.(\\**.(\\||\\.))*");
+	cout << "suffix : " << suffix << '\n';
+
+	int start_id = 1;
+	NFA * nfa = NFA::create(suffix, 10, "ID", start_id);
+
+	traverse(*nfa);
+	cout<<"\nnow the start_id : "<<start_id<<'\n';
+
+	delete nfa;
+}
+
+
 int main()
 {
 	// test_1();
 	// test_2();
-	test_3();
+	// test_3();
+	test_4();
 	return 0;
 }

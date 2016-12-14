@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	08 November 2016
-Modified 	: 	08 November 2016
+Modified 	: 	14 November 2016
 Version 	: 	1.0
 */
 
@@ -81,7 +81,15 @@ namespace Seven
 				}while(A.top() != '(');
 				A.pop();
 				i++;
-			}else{
+			}
+			else if(ch == '\\'){
+				tmp.clear();
+				tmp += ch;
+				tmp += infix[i + 1];
+				B.push(tmp);
+				i = i + 2;
+			}
+			else{
 				tmp.clear();
 				tmp += ch;
 				B.push(tmp);

@@ -148,16 +148,16 @@
                 /* 参数start_id是这个NFA中的结点的起始编号，因为NFA会不断变换合并，所以需要通过参数来显示指明编号 */  
                 NFA(int vt, int start_id);  
                 
-                /* 根据终结符'*'，对一个NFA进行闭包变换 */  
+                /* 根据运算符'*'，对一个NFA进行闭包变换 */  
                 /* 在变换的时候会引入两个新的结点，所以到指明新结点的起始编号 */  
                 static void closure(NFA * nfa, int start_id);  
                 
-                /* 根据终结符'|'，对两个NFA进行合并 */  
+                /* 根据运算符'|'，对两个NFA进行合并 */  
                 /* 在合并的时候会引入两个新的结点，所以到指明新结点的起始编号 */  
                 /* 注意，把第二个NFA合并到第一个中，原来第二个NFA里的指针置空以节约内存 */  
                 static void merge(NFA * left, NFA * right, int start_id);  
                 
-                /* 根据终结符'.'，对两个NFA进行连接 */  
+                /* 根据运算符'.'，对两个NFA进行连接 */  
                 /* 在连接的时候不会引入新的结点 */  
                 /* 注意，把第二个NFA合并到第一个中，原来第二个NFA里的指针置空以节约内存 */  
                 static void join(NFA * left, NFA * right);  

@@ -255,6 +255,10 @@ namespace Seven
 			}
 			else{
 				// 遇到终结符，则构造两点一边的简单NFA，并压栈
+				if(ch == '\\'){
+					// 碰到 \* \. \| 则取\之后的那个字符
+					ch = suffixRegex[++i];
+				}
 				nfa_1 = new NFA(int(ch), start_id);
 				S.push(nfa_1);
 				start_id += 2;
