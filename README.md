@@ -41,14 +41,26 @@ I just want to experience what a compiler is.
         {  
         	// 1. define some paths  
         	//    ( please change to your own path )  
+        	
+        	// 正规表达式配置文件  
         	const char * path_conf = "/home/seven/gitspace/compiler/conf/regex.conf";  
+        	
+        	// 最终生成optimized-DFA的存放路径  
         	const char * path_odfa = "/home/seven/gitspace/compiler/bin/odfa.dat";  
+        	
+        	// 待分析源代码的路径  
         	const char * path_input = "/home/seven/gitspace/compiler/bin/input.cpp";  
+        	
+        	// 分析结果日志的路径  
         	const char * path_res = "/home/seven/gitspace/compiler/bin/res.log";  
+        	
+        	// 分析报错日志的路径  
         	const char * path_error = "/home/seven/gitspace/compiler/bin/error.log";  
+        
         
         	// 2. try to load optimized-DFA  
             ODFA * odfa = ODFA::load(path_odfa);  
+
 
             // 3. if optimized-DFA not exist  
             if(odfa == NULL){  
@@ -68,12 +80,15 @@ I just want to experience what a compiler is.
                 delete dfa;  
             }  
         
+        
         	// 4. scan a code file  
         	//    logs with json format  
         	odfa->scan(path_input, path_res, path_error);  
         
+        
         	// 5. delete  
         	delete odfa;  
+        
         
         	return 0;  
         }  
