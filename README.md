@@ -8,10 +8,15 @@ I just want to experience what a compiler is.
 ### 一.　目录结构 ###
 
         doc/  
-            设计文档  
+            设计文档，其中 :  
+                词法分析  : 01 ~ 06  
+                语法分析  : 07 ~  
 
         lexical/  
             词法分析代码模块  
+        
+        grammar/  
+            语法分析代码模块  
         
         test/  
             测试代码模块  
