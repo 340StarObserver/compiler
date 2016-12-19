@@ -17,8 +17,12 @@ using std::string;
 namespace Seven
 {
 	/* 产生式 */
-	struct Production
+	class Production
 	{
+	public:
+		// ε
+		static string Null;
+
 		/*
 		例如，要表示 "S -> if S else S"，则 :
 			_exp  = { "S", "if", "S", "else", "S" }

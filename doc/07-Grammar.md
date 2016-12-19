@@ -3,7 +3,7 @@
 
 ### 一.　产生式类的设计 ###
 
-        struct Production  
+        class Production  
         {  
             public :  
             
@@ -56,3 +56,20 @@
                 /* 读取文法配置文件 */  
                 static void init(const char * path);  
         };  
+
+
+### 三.　文法配置文件的格式 ###
+
+        产生式1  
+        该产生式中各文法符号是否是终结符  
+        
+        产生式2  
+        该产生式中各文法符号是否是终结符  
+        
+        // 例如 :  
+        
+        S' -> S  
+        0 0  
+        
+        S -> if S else S  
+        0 1 0 1 0  

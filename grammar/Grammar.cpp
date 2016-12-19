@@ -17,6 +17,7 @@ using std::stringstream;
 namespace Seven
 {
 	/* init static data */
+	string Production::Null;
 	vector<Production> Grammar::Plist;
 
 	/* init from a conf file */
@@ -44,6 +45,10 @@ namespace Seven
 				while(getline(ss, word, ' '))
 					prod._exp.push_back(word);
 				prod._exp.erase(prod._exp.begin() + 1);
+				if(prod._exp.size() == 1){
+					// push ε
+					prod._exp.push_back(Production::Null);
+				}
 
 				// 3. fill prod._isVt[]
 				int n = prod._exp.size();
