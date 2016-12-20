@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	19 December 2016
-Modified 	: 	19 December 2016
+Modified 	: 	20 December 2016
 Version 	: 	1.0
 */
 
@@ -29,16 +29,16 @@ int main()
 	for(int i = 0; i < n; i++){
 		Production p = Grammar::Plist[i];
 
-		for(int j = 0; j < p._exp.size(); j++)
-			cout << p._exp[j] << '\t';
+		for(int j = 0; j < p.exp.size(); j++)
+			cout << p.exp[j] << '\t';
 		cout << '\n';
 
-		for(int j = 0; j < p._isVt.size(); j++)
-			cout << p._isVt[j] << '\t';
+		for(int j = 0; j < p.isVt.size(); j++)
+			cout << p.isVt[j] << '\t';
 		cout << '\n';
 
-		cout << "ppos : " << p._ppos << '\n';
-		cout << "sstr : " << p._sstr << '\n';
+		cout << "ppos : " << p.ppos << '\n';
+		cout << "sstr : " << p.sstr << '\n';
 		cout << '\n';
 	}
 

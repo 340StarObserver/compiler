@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	19 December 2016
-Modified 	: 	19 December 2016
+Modified 	: 	20 December 2016
 Version 	: 	1.0
 */
 
@@ -37,25 +37,25 @@ namespace Seven
 			while(getline(in, line)){
 				// 1. create a Production
 				Production prod;
-				prod._ppos = -1;
+				prod.ppos = -1;
 
 				// 2. split this line into words
 				stringstream ss(line);
 				string word;
 				while(getline(ss, word, ' '))
-					prod._exp.push_back(word);
-				prod._exp.erase(prod._exp.begin() + 1);
-				if(prod._exp.size() == 1){
+					prod.exp.push_back(word);
+				prod.exp.erase(prod.exp.begin() + 1);
+				if(prod.exp.size() == 1){
 					// push ε
-					prod._exp.push_back(Production::Null);
+					prod.exp.push_back(Production::Null);
 				}
 
 				// 3. fill prod._isVt[]
-				int n = prod._exp.size();
+				int n = prod.exp.size();
 				int value;
 				while(n > 0){
 					in >> value;
-					prod._isVt.push_back(bool(value));
+					prod.isVt.push_back(bool(value));
 					n--;
 				}
 

@@ -7,29 +7,32 @@
         {  
             public :  
             
+                /* 用空串表示 ε */  
+                static string Null;  
+            
                 /*  
                 例如，要表示 "S -> if S else S"，则 :  
-                    _exp  = { "S", "if", "S", "else", "S" }  
-                    _isVt = { 0  , 1   , 0  , 1     , 0   }  
+                    exp  = { "S", "if", "S", "else", "S" }  
+                    isVt = { 0  , 1   , 0  , 1     , 0   }  
                 其中 :  
-                    _isVt[i] == 0  表示那个位置是一个非终结符的文法符号  
-                    _isVt[i] == 1  表示那个位置是一个终结符的文法符号  
+                    isVt[i] == 0  表示那个位置是一个非终结符的文法符号  
+                    isVt[i] == 1  表示那个位置是一个终结符的文法符号  
                 */  
-                vector<string> _exp;  
-                vector<bool>   _isVt;  
+                vector<string> exp;  
+                vector<bool>   isVt;  
                 
                 
                 /*  
                 其中 :  
-                    _ppos  是"."的位置  
-                    _sstr  是搜索符  
+                    ppos  是"."的位置  
+                    sstr  是搜索符  
                 例如，要表示一个项目集中的元素 [ "S -> ·if S else S", "$" ]，则 :  
-                    _exp 和 _isVt 不变  
-                    _ppos = 0  
-                    _sstr = "$"  
+                    exp 和 isVt 不变  
+                    ppos = 0  
+                    sstr = "$"  
                 */  
-                int _ppos;  
-                string _sstr;  
+                int ppos;  
+                string sstr;  
                 
                 
                 /*  
@@ -44,15 +47,15 @@
 
         class Grammar  
         {  
-            private :  
+            public :  
                 /*  
                 文法是一组产生式的集合  
                 注意，产生式的下标就是它的编号（从零开始）  
                 注意，确保零号产生式是 "S' -> S"  
                 */  
-                static vector<Production> _productions;  
+                static vector<Production> Plist;  
             
-            public  :  
+            public :  
                 /* 读取文法配置文件 */  
                 static void init(const char * path);  
         };  
