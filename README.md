@@ -1,7 +1,7 @@
-## C compiler ##
+## compiler ##
 
 
-Lexical analyzer & grammar analyzer for C language.  
+Lexical analyzer & grammar analyzer for any language.  
 I just want to experience what a compiler is.  
 
 
