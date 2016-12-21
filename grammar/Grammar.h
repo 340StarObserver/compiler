@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	19 December 2016
-Modified 	: 	20 December 2016
+Modified 	: 	21 December 2016
 Version 	: 	1.0
 */
 
@@ -45,6 +45,9 @@ namespace Seven
 		*/
 		int ppos;
 		string sstr;
+
+		/* operator < */
+		bool operator < (const Production & p)const;
 
 		/*
 		可见，我把原文法产生式 & 构造LR(1)语法分析表时用到的项目集元素，合并了起来

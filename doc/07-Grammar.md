@@ -28,7 +28,7 @@
                     sstr  是搜索符  
                 例如，要表示一个项目集中的元素 [ "S -> ·if S else S", "$" ]，则 :  
                     exp 和 isVt 不变  
-                    ppos = 0  
+                    ppos = 1  
                     sstr = "$"  
                 */  
                 int ppos;  

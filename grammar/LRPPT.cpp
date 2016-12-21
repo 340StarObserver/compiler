@@ -1,12 +1,14 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	20 December 2016
-Modified 	: 	20 December 2016
+Modified 	: 	21 December 2016
 Version 	: 	1.0
 */
 
 #include "LRPPT.h"
-#include "Grammar.h"
+
+#include <queue>
+using std::queue;
 
 namespace Seven
 {
@@ -41,6 +43,60 @@ namespace Seven
 			set<string> tmp = First(S, M, index + 1);
 			for(set<string>::iterator it = tmp.begin(); it != tmp.end(); ++it)
 				res.insert(*it);
+		}
+
+		return res;
+	}
+
+
+	/* 求LR(1)项目集的闭包 */
+	set<Production> LRPPT::closure(const set<Production> & pset)
+	{
+		// 定义结果集
+		set<Production> res;
+
+		// 准备工作队列，并且要把pset中的所有元素扔进该队列
+		queue<Production> Q;
+		for(set<Production>::iterator it = pset.begin(); it != pset.end(); ++it)
+			Q.push(*it);
+
+		// do BFS
+		while(Q.empty() == false){
+			// 队首出队
+			Production p = Q.front();
+			Q.pop();
+
+			// if haven't visited p
+			if(res.find(p) == res.end()){
+				// add p to res
+				res.insert(p);
+
+				// 接下来将p的所有扩展结点入队 :
+				// p 这个产生式，可以抽象成 [ A -> α·Bβ, a ]
+				for(int i = 0; i < Grammar::Plist.size(); i++){
+					// if G[i].左部是B，则可以抽象成 B -> γ
+					if(Grammar::Plist[i].exp[0] == p.exp[p.ppos]){
+						// T = First(βa)
+						vector<string> tmp_S;
+						vector<bool> tmp_M;
+						for(int j = p.ppos + 1; j < p.exp.size(); j++){
+							tmp_S.push_back(p.exp[j]);
+							tmp_M.push_back(p.isVt[j]);
+						}
+						tmp_S.push_back(p.sstr);
+						tmp_M.push_back(true);
+						set<string> T = First(tmp_S, tmp_M, 0);
+
+						// for T中的每个元素t, 将 [ B -> ·γ, t ] 入队
+						Production next = Grammar::Plist[i];
+						next.ppos = 1;
+						for(set<string>::iterator it = T.begin(); it != T.end(); ++it){
+							next.sstr = *it;
+							Q.push(next);
+						}
+					}
+				}
+			}
 		}
 
 		return res;

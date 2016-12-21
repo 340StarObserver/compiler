@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	19 December 2016
-Modified 	: 	20 December 2016
+Modified 	: 	21 December 2016
 Version 	: 	1.0
 */
 
@@ -20,6 +20,37 @@ namespace Seven
 	string Production::Null;
 	vector<Production> Grammar::Plist;
 
+	/* operator < */
+	bool Production::operator < (const Production & p)const
+	{
+		// 1. compare ppos
+		if(ppos < p.ppos)
+			return true;
+		if(ppos > p.ppos)
+			return false;
+
+		// 2. compare sstr
+		if(sstr < p.sstr)
+			return true;
+		if(sstr > p.sstr)
+			return false;
+
+		// 3. compare exp
+		int n1 = this->exp.size();
+		int n2 = p.exp.size();
+		if(n1 < n2)
+			return true;
+		if(n1 > n2)
+			return false;
+		for(int i = 0; i < n1; i++){
+			if(this->exp[i] < p.exp[i])
+				return true;
+			if(this->exp[i] > p.exp[i])
+				return false;
+		}
+		return false;
+	}
+
 	/* init from a conf file */
 	void Grammar::init(const char * path)
 	{
@@ -37,7 +68,7 @@ namespace Seven
 			while(getline(in, line)){
 				// 1. create a Production
 				Production prod;
-				prod.ppos = -1;
+				prod.ppos = 0;
 
 				// 2. split this line into words
 				stringstream ss(line);

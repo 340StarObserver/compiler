@@ -1,12 +1,14 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	20 December 2016
-Modified 	: 	20 December 2016
+Modified 	: 	21 December 2016
 Version 	: 	1.0
 */
 
 #ifndef _LRPPT_H
 #define _LRPPT_H
+
+#include "Grammar.h"
 
 #include <string>
 using std::string;
@@ -35,6 +37,16 @@ namespace Seven
 			执行之前，确保进行了Grammar::init
 		*/
 		static set<string> First(const vector<string> & S, const vector<bool> & M, int index);
+
+
+		/*
+		求LR(1)项目集的闭包
+		参数的解释 :
+			pset 	: 	产生式集合
+		返回值解释 :
+			产生式集合
+		*/
+		static set<Production> closure(const set<Production> & pset);
 	};
 }
 

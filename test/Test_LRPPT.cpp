@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	20 December 2016
-Modified 	: 	20 December 2016
+Modified 	: 	21 December 2016
 Version 	: 	1.0
 */
 
@@ -9,6 +9,7 @@ Version 	: 	1.0
 
 #include "../grammar/Grammar.h"
 using Seven::Grammar;
+using Seven::Production;
 
 #include "../grammar/LRPPT.h"
 using Seven::LRPPT;
@@ -103,9 +104,97 @@ void test_2()
 }
 
 
+/* print a Production-set */
+void print_production_set(int id, const set<Production> & pset)
+{
+	cout << "I[" << id << "] size : " << pset.size() << "\n{\n";
+	for(set<Production>::iterator it = pset.begin(); it != pset.end(); ++it){
+		cout << "\n\t";
+		Production cur = *it;
+		for(int j = 0; j < cur.exp.size(); j++)
+			cout << cur.exp[j] << '\t';
+		cout << "\n\t";
+		for(int j = 0; j < cur.isVt.size(); j++)
+			cout << cur.isVt[j] << '\t';
+		cout << "\n\t";
+		cout << "ppos : " << cur.ppos << "\n\t";;
+		cout << "sstr : " << cur.sstr << "\n\n";
+	}
+	cout << "}\n";
+}
+
+
+/* test LRPPT::closure when it is public */
+void test_3()
+{
+	/*
+	make sure "conf/production.conf" is :
+		S' -> S
+		0 0
+
+		S -> if S else S
+		0 1 0 1 0
+
+		S -> if S
+		0 1 0
+
+		S -> S ; S
+		0 0 1 0
+
+		S -> a
+		0 1
+	*/
+
+	// 1. prepare { [ S' -> ·S, $ ] }
+	Production p = Grammar::Plist[0];
+	p.ppos = 1;
+	p.sstr = "$";
+	set<Production> i0;
+	i0.insert(p);
+
+	// 2. calculate i0
+	i0 = LRPPT::closure(i0);
+	print_production_set(0, i0);
+
+	// 3. prepare :
+	// 	[ S -> if · S else S, else ]
+	// 	[ S -> if · S else S, $ ]
+	// 	[ S -> if · S else S, ; ]
+	// 	[ S -> if · S, else ]
+	// 	[ S -> if · S, $ ]
+	// 	[ S -> if · S, ; ]
+	set<Production> i6;
+	Production p1 = Grammar::Plist[1];
+	p1.ppos = 2;
+	{
+		p1.sstr = "else";
+		i6.insert(p1);
+		p1.sstr = "$";
+		i6.insert(p1);
+		p1.sstr = ";";
+		i6.insert(p1);
+	}
+	Production p2 = Grammar::Plist[2];
+	p2.ppos = 2;
+	{
+		p2.sstr = "else";
+		i6.insert(p2);
+		p2.sstr = "$";
+		i6.insert(p2);
+		p2.sstr = ";";
+		i6.insert(p2);
+	}
+
+	// 4. calculate i6
+	i6 = LRPPT::closure(i6);
+	print_production_set(6, i6);
+}
+
+
 int main()
 {
 	Grammar::init("/home/seven/gitspace/compiler/conf/production.conf");
-	test_2();
+	// test_2();
+	test_3();
 	return 0;
 }
