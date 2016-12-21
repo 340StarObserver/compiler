@@ -9,8 +9,16 @@ I just want to experience what a compiler is.
 
         doc/  
             设计文档，其中 :  
-                词法分析  : 01 ~ 06  
-                语法分析  : 07 ~  
+                词法分析  :  
+                    01-SuffixRegex.md    --  中缀正规表达式转后缀  
+                    02-Regex.md          --  我要支持哪些正规表达式  
+                    03-NFA.md            --  根据后缀正规表达式，构造NFA  
+                    04-DFA.md            --  根据NFA，构造DFA  
+                    05-ODFA.md           --  根据DFA，构造optimized-DFA  
+                    06-Scan.md           --  使用optimized-DFA，对一段代码做词法分析  
+                语法分析  :  
+                    07-Grammar.md        --  文法如何表示  
+                    08-LR1.md            --  根据文法，构造LR(1)语法的预测分析表  
 
         lexical/  
             词法分析代码模块  
