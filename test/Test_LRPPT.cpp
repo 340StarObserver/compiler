@@ -145,49 +145,28 @@ void test_3()
 		0 1
 	*/
 
-	// 1. prepare { [ S' -> ·S, $ ] }
+	// 1. prepare [ S' -> ·S, $ ]
 	Production p = Grammar::Plist[0];
 	p.ppos = 1;
 	p.sstr = "$";
+
+	// 2. i0 = closure({ [ S' -> ·S, $ ] })
 	set<Production> i0;
 	i0.insert(p);
-
-	// 2. calculate i0
 	i0 = LRPPT::closure(i0);
 	print_production_set(0, i0);
 
-	// 3. prepare :
-	// 	[ S -> if · S else S, else ]
-	// 	[ S -> if · S else S, $ ]
-	// 	[ S -> if · S else S, ; ]
-	// 	[ S -> if · S, else ]
-	// 	[ S -> if · S, $ ]
-	// 	[ S -> if · S, ; ]
-	set<Production> i6;
-	Production p1 = Grammar::Plist[1];
-	p1.ppos = 2;
-	{
-		p1.sstr = "else";
-		i6.insert(p1);
-		p1.sstr = "$";
-		i6.insert(p1);
-		p1.sstr = ";";
-		i6.insert(p1);
-	}
-	Production p2 = Grammar::Plist[2];
-	p2.ppos = 2;
-	{
-		p2.sstr = "else";
-		i6.insert(p2);
-		p2.sstr = "$";
-		i6.insert(p2);
-		p2.sstr = ";";
-		i6.insert(p2);
-	}
+	// 3. i1 = closure( goTo(i0, S) )
+	set<Production> i1 = LRPPT::closure(LRPPT::goTo(i0, "S"));
+	print_production_set(1, i1);
 
-	// 4. calculate i6
-	i6 = LRPPT::closure(i6);
-	print_production_set(6, i6);
+	// 4. i2 = closure( goTo(i0, if) )
+	set<Production> i2 = LRPPT::closure(LRPPT::goTo(i0, "if"));
+	print_production_set(2, i2);
+
+	// 5. i3 = closure( goTo(i0, a) )	
+	set<Production> i3 = LRPPT::closure(LRPPT::goTo(i0, "a"));
+	print_production_set(3, i3);
 }
 
 

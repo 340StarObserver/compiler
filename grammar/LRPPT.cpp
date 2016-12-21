@@ -102,4 +102,24 @@ namespace Seven
 		return res;
 	}
 
+
+	/* LR(1)项目集的goTo操作 */
+	set<Production> LRPPT::goTo(const set<Production> & pset, const string & X)
+	{
+		set<Production> res;
+
+		for(set<Production>::iterator it = pset.begin(); it != pset.end(); ++it){
+			Production p = *it;
+
+			// p 可以抽象成 [ A -> α·Xβ, a ]
+			// add [ A -> αX·β, a ] to res
+			if(p.exp[p.ppos] == X){
+				p.ppos = p.ppos + 1;
+				res.insert(p);
+			}
+		}
+
+		return res;
+	}
+
 }

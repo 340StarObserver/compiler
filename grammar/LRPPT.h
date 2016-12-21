@@ -47,6 +47,19 @@ namespace Seven
 			产生式集合
 		*/
 		static set<Production> closure(const set<Production> & pset);
+
+
+		/*
+		LR(1)项目集的goTo操作
+		参数的解释 :
+			pset 	: 	产生式集合
+			X 	: 	文法符号（可以是终结符，也可以是非终结符）
+		返回值解释 :
+			产生式集合
+		注意的地方 :
+			该方法经常和closure配合使用，比如 I1 = closure( goTo(I0, "if") )
+		*/
+		static set<Production> goTo(const set<Production> & pset, const string & X);
 	};
 }
 
