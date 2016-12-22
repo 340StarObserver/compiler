@@ -20,6 +20,7 @@ namespace Seven
 	string Production::Null;
 	vector<Production> Grammar::Plist;
 
+
 	/* operator < */
 	bool Production::operator < (const Production & p)const
 	{
@@ -50,6 +51,32 @@ namespace Seven
 		}
 		return false;
 	}
+
+
+	/* operator == */
+	bool Production::operator == (const Production & p)const
+	{
+		// 1. compare ppos
+		if(ppos != p.ppos)
+			return false;
+
+		// 2. compare sstr
+		if(sstr != p.sstr)
+			return false;
+
+		// 3. compare exp
+		int n1 = this->exp.size();
+		int n2 = p.exp.size();
+		if(n1 != n2)
+			return false;
+		for(int i = 0; i < n1; i++){
+			if(this->exp[i] != p.exp[i])
+				return false;
+		}
+
+		return true;
+	}
+
 
 	/* init from a conf file */
 	void Grammar::init(const char * path)

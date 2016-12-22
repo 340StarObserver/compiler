@@ -60,6 +60,27 @@ namespace Seven
 			该方法经常和closure配合使用，比如 I1 = closure( goTo(I0, "if") )
 		*/
 		static set<Production> goTo(const set<Production> & pset, const string & X);
+
+
+		/*
+		判断某项目集是否已经出现过
+		参数的解释 :
+			U 	: 	当前构建的所有项目集
+			pset 	: 	目标项目集
+		返回值解释 :
+			若找到则返回在U中的下标，反之返回 -1
+		*/
+		static int existState(const vector< set<Production> > & U, const set<Production> & pset);
+
+
+		/*
+		构造LR(1)文法的项目集族
+		参数的解释 :
+			U 	: 	用以保存项目集族
+		注意的地方 :
+			执行之前，确保进行了Grammar::init
+		*/
+		static void stateRace(vector< set<Production> > & U);
 	};
 }
 

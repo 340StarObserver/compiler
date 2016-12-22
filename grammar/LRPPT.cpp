@@ -122,4 +122,72 @@ namespace Seven
 		return res;
 	}
 
+
+	/* 判断某项目集是否已经出现过 */
+	int LRPPT::existState(const vector< set<Production> > & U, const set<Production> & pset)
+	{
+		for(int i = 0; i < U.size(); i++){
+			/* compare U[i] and pset */
+			if(U[i].size() == pset.size()){
+				bool w = true;
+				for(set<Production>::iterator it = U[i].begin(); it != U[i].end(); ++it){
+					if(pset.find(*it) == pset.end()){
+						w = false;
+						break;
+					}
+				}
+				if(w == true)
+					return i;
+			}
+		}
+
+		/* not found */
+		return -1;
+	}
+
+
+	/* 构造LR(1)文法的项目集族 */
+	void LRPPT::stateRace(vector< set<Production> > & U)
+	{
+		// first clean U
+		U.clear();
+
+		// assume G[0] is like "A -> B", calculate i0 = closure({ ["A -> ·B", $] })
+		Production p = Grammar::Plist[0];
+		p.ppos = 1;
+		p.sstr = "$";
+		set<Production> i0;
+		i0.insert(p);
+		i0 = closure(i0);
+
+		// prepare a work queue
+		queue< set<Production> > Q;
+		Q.push(i0);
+
+		// do BFS
+		while(Q.empty() == false){
+			// get the top
+			set<Production> cur = Q.front();
+			Q.pop();
+
+			// if this state hasn't been visited
+			if(existState(U, cur) == -1){
+				// add cur to U
+				U.push_back(cur);
+
+				// E = cur 的每个产生式里，位于·后面的文法符号的集合
+				set<string> E;
+				for(set<Production>::iterator p_it = cur.begin(); p_it != cur.end(); ++p_it){
+					p = *p_it;
+					if(p.ppos < p.exp.size() && p.exp[p.ppos] != Production::Null)
+						E.insert(p.exp[p.ppos]);
+				}
+
+				// 接下来把 cur 的所有扩展结点入队
+				for(set<string>::iterator e_it = E.begin(); e_it != E.end(); ++e_it)
+					Q.push( closure( goTo(cur, *e_it) ) );
+			}
+		}
+	}
+
 }

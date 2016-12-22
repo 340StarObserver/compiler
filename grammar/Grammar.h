@@ -49,6 +49,9 @@ namespace Seven
 		/* operator < */
 		bool operator < (const Production & p)const;
 
+		/* operator == */
+		bool operator == (const Production & p)const;
+
 		/*
 		可见，我把原文法产生式 & 构造LR(1)语法分析表时用到的项目集元素，合并了起来
 		因为后者相对于前者，就多了两个属性嘛，而且不会对前两个属性产生影响

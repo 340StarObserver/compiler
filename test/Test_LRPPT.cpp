@@ -170,10 +170,23 @@ void test_3()
 }
 
 
+/* test LRPPT::stateRace when it is public */
+void test_4()
+{
+	vector< set<Production> > U;
+	LRPPT::stateRace(U);
+
+	cout << "state number : " << U.size() << '\n';
+	for(int i = 0; i < U.size(); i++)
+		print_production_set(i, U[i]);
+}
+
+
 int main()
 {
 	Grammar::init("/home/seven/gitspace/compiler/conf/production.conf");
 	// test_2();
-	test_3();
+	// test_3();
+	test_4();
 	return 0;
 }

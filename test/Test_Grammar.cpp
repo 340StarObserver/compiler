@@ -49,9 +49,9 @@ int main()
 		}
 	}
 
-	// test Production::operator in a set
+	// test Production::operator < in a set
 	{
-		cout << "\n< test Production::operator in a set >\n";
+		cout << "\n< test Production::operator < in a set >\n";
 
 		set<Production> S;
 		S.insert(Grammar::Plist[0]);
@@ -77,6 +77,14 @@ int main()
 			cout << "sstr : " << p.sstr << '\n';
 			cout << '\n';
 		}
+	}
+
+	// test Production::operator ==
+	{
+		cout << "\n< test Production::operator == >\n";
+		cout << (Grammar::Plist[0] == Grammar::Plist[0]) << '\n';
+		cout << (Grammar::Plist[0] == Grammar::Plist[1]) << '\n';
+		cout << '\n';
 	}
 
 	return 0;
