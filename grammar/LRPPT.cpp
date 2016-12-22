@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	20 December 2016
-Modified 	: 	21 December 2016
+Modified 	: 	22 December 2016
 Version 	: 	1.0
 */
 
@@ -75,7 +75,7 @@ namespace Seven
 				// p 这个产生式，可以抽象成 [ A -> α·Bβ, a ]
 				for(int i = 0; i < Grammar::Plist.size(); i++){
 					// if G[i].左部是B，则可以抽象成 B -> γ
-					if(Grammar::Plist[i].exp[0] == p.exp[p.ppos]){
+					if(p.ppos < p.exp.size() && Grammar::Plist[i].exp[0] == p.exp[p.ppos]){
 						// T = First(βa)
 						vector<string> tmp_S;
 						vector<bool> tmp_M;
@@ -113,7 +113,7 @@ namespace Seven
 
 			// p 可以抽象成 [ A -> α·Xβ, a ]
 			// add [ A -> αX·β, a ] to res
-			if(p.exp[p.ppos] == X){
+			if(p.ppos < p.exp.size() && p.exp[p.ppos] == X){
 				p.ppos = p.ppos + 1;
 				res.insert(p);
 			}
