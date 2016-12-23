@@ -86,7 +86,7 @@ namespace Seven
 			A 	: 	终结符列表
 			B 	: 	非终结符列表
 			TA 	: 	用以记录Action表
-			TB 	: 	用以记录Goto表
+			TG 	: 	用以记录Goto表
 		注意的地方 :
 			1.
 				U.size = m
