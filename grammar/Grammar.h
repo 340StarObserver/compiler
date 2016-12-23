@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	19 December 2016
-Modified 	: 	21 December 2016
+Modified 	: 	23 December 2016
 Version 	: 	1.0
 */
 
@@ -73,6 +73,35 @@ namespace Seven
 
 		/* 读取文法配置文件 */
 		static void init(const char * path);
+
+		/*
+		获取终结符列表 & 非终结符列表
+		参数的解释 :
+			A 	: 	用以保存终结符列表
+			B 	: 	用以保存非终结符列表
+		注意的地方 :
+			终结符列表的最后一个元素是"$"
+		*/
+		static void classify(vector<string> & A, vector<string> & B);
+
+		/*
+		查找文法符号
+		参数的解释 :
+			C 		: 	终结符列表 or 非终结符列表
+			symbol 	: 	文法符号
+		返回值解释 :
+			若找到则返回在C中的下标，反之返回 -1
+		*/
+		static int findSymbol(const vector<string> & C, const string & symbol);
+
+		/*
+		查找产生式
+		参数的解释 :
+			p 	: 	产生式
+		返回值解释 :
+			若找到则返回下标，反之返回 -1
+		*/
+		static int findProduction(const Production & p);
 	};
 
 }

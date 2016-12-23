@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	20 December 2016
-Modified 	: 	22 December 2016
+Modified 	: 	23 December 2016
 Version 	: 	1.0
 */
 
@@ -9,6 +9,12 @@ Version 	: 	1.0
 
 #include <queue>
 using std::queue;
+
+#include <cstring>
+using std::memset;
+
+#include <iostream>
+using std::cout;
 
 namespace Seven
 {
@@ -124,7 +130,7 @@ namespace Seven
 
 
 	/* 判断某项目集是否已经出现过 */
-	int LRPPT::existState(const vector< set<Production> > & U, const set<Production> & pset)
+	int LRPPT::findState(const vector< set<Production> > & U, const set<Production> & pset)
 	{
 		for(int i = 0; i < U.size(); i++){
 			/* compare U[i] and pset */
@@ -171,7 +177,7 @@ namespace Seven
 			Q.pop();
 
 			// if this state hasn't been visited
-			if(existState(U, cur) == -1){
+			if(findState(U, cur) == -1){
 				// add cur to U
 				U.push_back(cur);
 
@@ -187,6 +193,169 @@ namespace Seven
 				for(set<string>::iterator e_it = E.begin(); e_it != E.end(); ++e_it)
 					Q.push( closure( goTo(cur, *e_it) ) );
 			}
+		}
+	}
+
+
+	/* 构造预测分析表 */
+	void LRPPT::buildPredictTable(const vector< set<Production> > & U, const vector<string> & A, const vector<string> & B, int * TA, int * TG)
+	{
+		// TA[m*n1], TG[m*n2]
+		int m = U.size();
+		int n1 = A.size();
+		int n2 = B.size();
+
+		// set all item 0 ( 0 represent error )
+		memset(TA, 0, sizeof(int) * m * n1);
+		memset(TG, 0, sizeof(int) * m * n2);
+
+		// "accept" = [ S' -> S·, $ ]
+		Production accept = Grammar::Plist[0];
+		accept.ppos = 2;
+		accept.sstr = "$";
+
+		for(int i = 0; i < m; i++)
+		{
+			/*
+			U[i] 中的项目 :
+				可能形如 [ A -> α·aβ, b ] ，其中a是终结符
+				可能形如 [ A -> α·,     a ] ，其中A ≠ S'
+				可能形如 [ A -> α·Bβ, b ] ，其中B是非终结符
+			*/
+			for(set<Production>::iterator p_it = U[i].begin(); p_it != U[i].end(); ++p_it){
+				Production p = *p_it;
+
+				if(p.ppos == p.exp.size()){
+					if(p.exp[0] != Grammar::Plist[0].exp[0]){
+						// 形如 [ A -> α·,     a ] ，其中A ≠ S'
+						Production tmp = p;
+						tmp.ppos = 0;
+						tmp.sstr = "";
+						// 则置 Goto表(状态i, a) = A -> α 的编号
+						int k = Grammar::findProduction(tmp);
+						int j = Grammar::findSymbol(A, p.sstr);
+						if(k != -1 && j != -1)
+							TA[i * n1 + j] = -k;
+					}
+				}
+				else if(p.isVt[p.ppos] == false){
+					// 形如 [ A -> α·Bβ, b ] ，其中B是非终结符
+					// goto(状态i, B) 的编号 = k
+					// 则置 Action表(状态i, B) = k
+					int k = findState(U, closure(goTo(U[i], p.exp[p.ppos])));
+					int j = Grammar::findSymbol(B, p.exp[p.ppos]);
+					if(k != -1 && j != -1)
+						TG[i * n2 + j] = k;
+				}
+				else if(p.exp[p.ppos] != Production::Null){
+					// 形如 [ A -> α·aβ, b ] ，其中a是终结符
+					// goto(状态i, a) 的编号 = k
+					// 则置 Action表(状态i, a) = 移动状态k进栈
+					int k = findState(U, closure(goTo(U[i], p.exp[p.ppos])));
+					int j = Grammar::findSymbol(A, p.exp[p.ppos]);
+					if(k != -1 && j != -1)
+						TA[i * n1 + j] = k;
+				}
+			}
+
+			// 若 [ S' -> S·, $ ] 属于 U[i]
+			// 则置 Action表(状态i, $) = "accept"
+			if(U[i].find(accept) != U[i].end()){
+				int j = Grammar::findSymbol(A, "$");
+				TA[i * n1 + j] = m;
+			}
+		}
+	}
+
+
+	/* private constructor */
+	LRPPT::LRPPT()
+	{
+		_table_action = NULL;
+		_table_goto = NULL;
+		_rows = 0;
+	}
+
+
+	/* desconstructor */
+	LRPPT::~LRPPT()
+	{
+		if(_table_action != NULL)
+			delete []_table_action;
+		if(_table_goto != NULL)
+			delete []_table_goto;
+	}
+
+
+	/* create */
+	LRPPT * LRPPT::create()
+	{
+		// 1. define result
+		LRPPT * ppt = new LRPPT();
+
+		// 2. calculate terminal-symbols, non-terminal-symbols
+		Grammar::classify(ppt->_symbol_A, ppt->_symbol_B);
+
+		// 3. calculate State0, State1, State2, ...
+		vector< set<Production> > U;
+		stateRace(U);
+
+		// 4. fill Table-Action, Table-Goto
+		int m = U.size();
+		int n1 = ppt->_symbol_A.size();
+		int n2 = ppt->_symbol_B.size();
+		int * TA = new int[m * n1];
+		int * TG = new int[m * n2];
+		buildPredictTable(U, ppt->_symbol_A, ppt->_symbol_B, TA, TG);
+
+		// 5. set ppt
+		ppt->_table_action = TA;
+		ppt->_table_goto = TG;
+		ppt->_rows = m;
+
+		// 6. return
+		return ppt;
+	}
+
+
+	/* print the LRPPT */
+	void LRPPT::print()const
+	{
+		int m = _rows;
+		int n1 = _symbol_A.size();
+		int n2 = _symbol_B.size();
+
+		cout << '\t';
+		for(int i = 0; i < n1; i++)
+			cout << '\t' << _symbol_A[i];
+		cout << "\t|";
+		for(int i = 0; i < n2; i++)
+			cout << '\t' << _symbol_B[i];
+		cout << '\n';
+
+		for(int i = 0; i < m; i++)
+		{
+			cout << "I[" << i << "] ";
+			if(i < 10)
+				cout << ' ';
+			cout << ": \t";
+			for(int j = 0; j < n1; j++){
+				int t = _table_action[i * n1 + j];
+				if(t == m)
+					cout << "Acc";
+				else if(t > 0)
+					cout << 'S' << t;
+				else if(t < 0)
+					cout << 'r' << -t;
+				else
+					cout << t;
+				cout << '\t';
+			}
+			cout << "|\t";
+			for(int j = 0; j < n2; j++){
+				cout << _table_goto[i * n2 + j] << '\t';
+			}
+			cout << '\n';
 		}
 	}
 

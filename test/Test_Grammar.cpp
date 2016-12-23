@@ -17,14 +17,9 @@ using std::cout;
 #include <set>
 using std::set;
 
-int main()
+
+void test_1()
 {
-	// 1. define conf path
-	const char * path = "/home/seven/gitspace/compiler/conf/production.conf";
-
-	// 2. read conf
-	Grammar::init(path);
-
 	// test Grammar::init
 	{
 		cout << "< test Grammar::init >\n";
@@ -48,7 +43,11 @@ int main()
 			cout << '\n';
 		}
 	}
+}
 
+
+void test_2()
+{
 	// test Production::operator < in a set
 	{
 		cout << "\n< test Production::operator < in a set >\n";
@@ -78,7 +77,11 @@ int main()
 			cout << '\n';
 		}
 	}
+}
 
+
+void test_3()
+{
 	// test Production::operator ==
 	{
 		cout << "\n< test Production::operator == >\n";
@@ -86,6 +89,48 @@ int main()
 		cout << (Grammar::Plist[0] == Grammar::Plist[1]) << '\n';
 		cout << '\n';
 	}
+}
+
+
+void test_4()
+{
+	vector<string> A, B;
+
+	// test Grammar::classify
+	{
+		Grammar::classify(A, B);
+
+		cout << "vt     : \t";
+		for(int i = 0; i < A.size(); i++)
+			cout << A[i] << '\t';
+		cout << "\nnum : " << A.size() << '\n';
+
+		cout << "\nnon-vt : \t";
+		for(int i = 0; i < B.size(); i++)
+			cout << B[i] << '\t';
+		cout << "\nnum : " << B.size() << "\n\n";
+	}
+
+	// test Grammar::findSymbol
+	{
+		for(int i = 0; i < A.size(); i++){
+			cout << "Find " << A[i] << " in A : " << Grammar::findSymbol(A, A[i]) << '\n';
+			cout << "Find " << A[i] << " in B : " << Grammar::findSymbol(B, A[i]) << '\n';
+		}
+		for(int i = 0; i < B.size(); i++){
+			cout << "Find " << B[i] << " in A : " << Grammar::findSymbol(A, B[i]) << '\n';
+			cout << "Find " << B[i] << " in B : " << Grammar::findSymbol(B, B[i]) << '\n';
+		}
+	}
+}
+
+
+int main()
+{
+	const char * path = "/home/seven/gitspace/compiler/conf/production.conf";
+	Grammar::init(path);
+
+	test_4();
 
 	return 0;
 }

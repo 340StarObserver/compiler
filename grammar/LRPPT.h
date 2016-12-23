@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	20 December 2016
-Modified 	: 	21 December 2016
+Modified 	: 	23 December 2016
 Version 	: 	1.0
 */
 
@@ -24,7 +24,7 @@ namespace Seven
 	/* LR(1)语法的预测分析表 */
 	class LRPPT
 	{
-	public:
+	private:
 		/*
 		计算文法符号串S的First
 		参数的解释 :
@@ -33,8 +33,6 @@ namespace Seven
 			index 	: 	当前分析S中的哪个符号(>=0)
 		返回值解释 :
 			终结符集合
-		注意的地方 :
-			执行之前，确保进行了Grammar::init
 		*/
 		static set<string> First(const vector<string> & S, const vector<bool> & M, int index);
 
@@ -70,17 +68,72 @@ namespace Seven
 		返回值解释 :
 			若找到则返回在U中的下标，反之返回 -1
 		*/
-		static int existState(const vector< set<Production> > & U, const set<Production> & pset);
+		static int findState(const vector< set<Production> > & U, const set<Production> & pset);
 
 
 		/*
 		构造LR(1)文法的项目集族
 		参数的解释 :
 			U 	: 	用以保存项目集族
-		注意的地方 :
-			执行之前，确保进行了Grammar::init
 		*/
 		static void stateRace(vector< set<Production> > & U);
+
+
+		/*
+		构造预测分析表
+		参数的解释 :
+			U 	: 	项目集族
+			A 	: 	终结符列表
+			B 	: 	非终结符列表
+			TA 	: 	用以记录Action表
+			TB 	: 	用以记录Goto表
+		注意的地方 :
+			1.
+				U.size = m
+				A.size = n1
+				B.size = n2
+				TA 是一维数组，长度是 m * n1
+				TG 是一维数组，长度是 m * n2
+			2.
+				TA[i] = k  ( k>=1 ) 	// 移动状态k进栈
+				TA[i] = -k ( k>=1 ) 	// 按k号产生式归约
+				TA[i] = m 		// Accept
+				TA[i] = 0 		// error
+			3.
+				TG[i] = k ( k>=1 ) 	// goto状态k
+				TG[i] = 0 		// error
+		*/
+		static void buildPredictTable(const vector< set<Production> > & U, const vector<string> & A, const vector<string> & B, int * TA, int * TG);
+
+	private:
+		/* 终结符列表( 包含 $ ) */
+		vector<string> _symbol_A;
+
+		/* 非终结符列表( 不包含 S' ) */
+		vector<string> _symbol_B;
+
+		/* Action-Table */
+		int * _table_action;
+
+		/* Goto-Table */
+		int * _table_goto;
+
+		/* rows of Action-Table and Goto-Table */
+		int _rows;
+
+	private:
+		/* private constructor */
+		LRPPT();
+
+	public:
+		/* create */
+		static LRPPT * create();
+
+		/* desconstructor */
+		~LRPPT();
+
+		/* print the LRPPT */
+		void print()const;
 	};
 }
 

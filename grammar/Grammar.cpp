@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	19 December 2016
-Modified 	: 	21 December 2016
+Modified 	: 	23 December 2016
 Version 	: 	1.0
 */
 
@@ -13,6 +13,9 @@ using std::ios;
 
 #include <sstream>
 using std::stringstream;
+
+#include <set>
+using std::set;
 
 namespace Seven
 {
@@ -128,6 +131,61 @@ namespace Seven
 			// finally close file
 			in.close();
 		}
+	}
+
+
+	/* 获取终结符列表 & 非终结符列表 */
+	void Grammar::classify(vector<string> & A, vector<string> & B)
+	{
+		// clean A & B
+		A.clear();
+		B.clear();
+
+		// prepare work sets( SA for A, SB for B )
+		set<string> SA, SB;
+		for(size_t i = 0; i < Plist.size(); i++){
+			for(size_t j = 0; j < Plist[i].exp.size(); j++){
+				if(Plist[i].isVt[j] == false){
+					if(Plist[i].exp[j] != Plist[0].exp[0])
+						SB.insert(Plist[i].exp[j]);
+				}
+				else if(Plist[i].exp[j] != Production::Null)
+					SA.insert(Plist[i].exp[j]);
+			}
+		}
+
+		// fill A
+		for(set<string>::iterator it = SA.begin(); it != SA.end(); ++it)
+			A.push_back(*it);
+		A.push_back("$");
+
+		// fill B
+		for(set<string>::iterator it = SB.begin(); it != SB.end(); ++it)
+			B.push_back(*it);
+	}
+
+
+	/* 查找文法符号 */
+	int Grammar::findSymbol(const vector<string> & C, const string & symbol)
+	{
+		int n = C.size();
+		for(int i = 0; i < n; i++){
+			if(C[i] == symbol)
+				return i;
+		}
+		return -1;
+	}
+
+
+	/* 查找产生式 */
+	int Grammar::findProduction(const Production & p)
+	{
+		int n = Plist.size();
+		for(int i = 0; i < n; i++){
+			if(Plist[i] == p)
+				return i;
+		}
+		return -1;
 	}
 
 }
