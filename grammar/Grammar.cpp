@@ -23,6 +23,7 @@ namespace Seven
 	string Production::NullSymbol;
 	string Production::EndSymbol("$");
 	vector<Production> Grammar::Plist;
+	set<GSrule> Grammar::VtRules;
 
 
 	/* operator < */
@@ -82,6 +83,50 @@ namespace Seven
 	}
 
 
+	/* constructor */
+	GSrule::GSrule(const string & symbol, int priority, bool combine)
+	{
+		_symbol = symbol;
+		_priority = priority;
+		_combine = combine;
+	}
+
+
+	/* get 文法符号 */
+	string GSrule::getSymbol()const
+	{
+		return _symbol;
+	}
+
+
+	/* get 优先级 */
+	int GSrule::getPriority()const
+	{
+		return _priority;
+	}
+
+
+	/* get 结合规则 */
+	bool GSrule::getCombine()const
+	{
+		return _combine;
+	}
+
+
+	/* operator < */
+	bool GSrule::operator < (const GSrule & rule)const
+	{
+		return _symbol < rule._symbol;
+	}
+
+
+	/* operator == */
+	bool GSrule::operator == (const GSrule & rule)const
+	{
+		return _symbol == rule._symbol;
+	}
+
+
 	/* init from a conf file */
 	void Grammar::init(const char * path)
 	{
@@ -91,6 +136,7 @@ namespace Seven
 
 		// clear the original data
 		Plist.clear();
+		VtRules.clear();
 
 		if(in.is_open() == true)
 		{
@@ -115,16 +161,38 @@ namespace Seven
 				// 3. fill prod._isVt[]
 				int n = prod.exp.size();
 				int value;
-				while(n > 0){
+				for(int i = 0; i < n; i++){
 					in >> value;
 					prod.isVt.push_back(bool(value));
-					n--;
 				}
 
 				// 4. push this production
 				Plist.push_back(prod);
 
-				// 5. jump '\n' & an empty line
+				// 5. read prioritys[]
+				int * prioritys = new int[n];
+				for(int i = 0; i < n; i++){
+					in >> value;
+					prioritys[i] = value;
+				}
+
+				// 6. read combines[]
+				bool * combines = new bool[n];
+				for(int i = 0; i < n; i++){
+					in >> value;
+					combines[i] = bool(value);
+				}
+
+				// 7. create GSrules
+				for(int i = 0; i < n; i++){
+					VtRules.insert(GSrule(prod.exp[i], prioritys[i], combines[i]));
+				}
+
+				// 8. delete temp arrays
+				delete []prioritys;
+				delete []combines;
+
+				// 9. jump '\n' & an empty line
 				getline(in, line);
 				getline(in, line);
 			}

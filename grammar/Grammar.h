@@ -11,6 +11,9 @@ Version 	: 	1.0
 #include <vector>
 using std::vector;
 
+#include <set>
+using std::set;
+
 #include <string>
 using std::string;
 
@@ -63,6 +66,39 @@ namespace Seven
 	};
 
 
+	/* 文法符号的规则 */
+	class GSrule
+	{
+	private:
+		/* 文法符号 */
+		string _symbol;
+		
+		/* 优先级 */
+		int _priority;
+		
+		/* 结合规则( 1代表左结合, 0代表右结合 ) */
+		bool _combine;
+	public:
+		/* constructor */
+		GSrule(const string & symbol, int priority, bool combine);
+
+		/* get 文法符号 */
+		string getSymbol()const;
+
+		/* get 优先级 */
+		int getPriority()const;
+
+		/* get 结合规则( 1代表左结合, 0代表右结合 ) */
+		bool getCombine()const;
+
+		/* operator < */
+		bool operator < (const GSrule & rule)const;
+
+		/* operator == */
+		bool operator == (const GSrule & rule)const;
+	};
+
+
 	/* 文法类 */
 	class Grammar
 	{
@@ -73,6 +109,9 @@ namespace Seven
 		注意，确保零号产生式是 "S' -> S"
 		*/
 		static vector<Production> Plist;
+
+		/* 文法的终结符规则 */
+		static set<GSrule> VtRules;
 
 		/* 读取文法配置文件 */
 		static void init(const char * path);

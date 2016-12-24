@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	20 December 2016
-Modified 	: 	23 December 2016
+Modified 	: 	24 December 2016
 Version 	: 	1.0
 */
 
@@ -9,15 +9,6 @@ Version 	: 	1.0
 #define _LRPPT_H
 
 #include "Grammar.h"
-
-#include <string>
-using std::string;
-
-#include <set>
-using std::set;
-
-#include <vector>
-using std::vector;
 
 namespace Seven
 {

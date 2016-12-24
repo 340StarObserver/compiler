@@ -10,6 +10,7 @@ Version 	: 	1.0
 #include "../grammar/Grammar.h"
 using Seven::Grammar;
 using Seven::Production;
+using Seven::GSrule;
 
 #include <iostream>
 using std::cout;
@@ -41,6 +42,13 @@ void test_1()
 			cout << "ppos : " << p.ppos << '\n';
 			cout << "sstr : " << p.sstr << '\n';
 			cout << '\n';
+		}
+
+		cout << "\nthe number of GSrules : " << Grammar::VtRules.size() << '\n';
+		for(set<GSrule>::iterator it = Grammar::VtRules.begin(); it != Grammar::VtRules.end(); ++it){
+			cout << (*it).getSymbol() << '\t';
+			cout << (*it).getPriority() << '\t';
+			cout << (*it).getCombine() << '\n';
 		}
 	}
 }
@@ -130,7 +138,7 @@ int main()
 	const char * path = "/home/seven/gitspace/compiler/conf/production.conf";
 	Grammar::init(path);
 
-	test_4();
+	test_1();
 
 	return 0;
 }
