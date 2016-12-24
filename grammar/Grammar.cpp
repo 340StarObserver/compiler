@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	19 December 2016
-Modified 	: 	23 December 2016
+Modified 	: 	24 December 2016
 Version 	: 	1.0
 */
 
@@ -20,7 +20,8 @@ using std::set;
 namespace Seven
 {
 	/* init static data */
-	string Production::Null;
+	string Production::NullSymbol;
+	string Production::EndSymbol("$");
 	vector<Production> Grammar::Plist;
 
 
@@ -108,7 +109,7 @@ namespace Seven
 				prod.exp.erase(prod.exp.begin() + 1);
 				if(prod.exp.size() == 1){
 					// push ε
-					prod.exp.push_back(Production::Null);
+					prod.exp.push_back(Production::NullSymbol);
 				}
 
 				// 3. fill prod._isVt[]
@@ -149,7 +150,7 @@ namespace Seven
 					if(Plist[i].exp[j] != Plist[0].exp[0])
 						SB.insert(Plist[i].exp[j]);
 				}
-				else if(Plist[i].exp[j] != Production::Null)
+				else if(Plist[i].exp[j] != Production::NullSymbol)
 					SA.insert(Plist[i].exp[j]);
 			}
 		}
@@ -157,7 +158,7 @@ namespace Seven
 		// fill A
 		for(set<string>::iterator it = SA.begin(); it != SA.end(); ++it)
 			A.push_back(*it);
-		A.push_back("$");
+		A.push_back(Production::EndSymbol);
 
 		// fill B
 		for(set<string>::iterator it = SB.begin(); it != SB.end(); ++it)

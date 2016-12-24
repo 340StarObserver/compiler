@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	19 December 2016
-Modified 	: 	23 December 2016
+Modified 	: 	24 December 2016
 Version 	: 	1.0
 */
 
@@ -21,7 +21,10 @@ namespace Seven
 	{
 	public:
 		// ε
-		static string Null;
+		static string NullSymbol;
+
+		// $
+		static string EndSymbol;
 
 		/*
 		例如，要表示 "S -> if S else S"，则 :

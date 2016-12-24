@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	20 December 2016
-Modified 	: 	23 December 2016
+Modified 	: 	24 December 2016
 Version 	: 	1.0
 */
 
@@ -45,7 +45,7 @@ namespace Seven
 		}
 
 		// ε ∈ res, 则需要把下一个文法符号的First也并进来
-		if(res.find(Production::Null) != res.end() && index < S.size() - 1){
+		if(res.find(Production::NullSymbol) != res.end() && index < S.size() - 1){
 			set<string> tmp = First(S, M, index + 1);
 			for(set<string>::iterator it = tmp.begin(); it != tmp.end(); ++it)
 				res.insert(*it);
@@ -161,7 +161,7 @@ namespace Seven
 		// assume G[0] is like "A -> B", calculate i0 = closure({ ["A -> ·B", $] })
 		Production p = Grammar::Plist[0];
 		p.ppos = 1;
-		p.sstr = "$";
+		p.sstr = Production::EndSymbol;
 		set<Production> i0;
 		i0.insert(p);
 		i0 = closure(i0);
@@ -185,7 +185,7 @@ namespace Seven
 				set<string> E;
 				for(set<Production>::iterator p_it = cur.begin(); p_it != cur.end(); ++p_it){
 					p = *p_it;
-					if(p.ppos < p.exp.size() && p.exp[p.ppos] != Production::Null)
+					if(p.ppos < p.exp.size() && p.exp[p.ppos] != Production::NullSymbol)
 						E.insert(p.exp[p.ppos]);
 				}
 
@@ -212,7 +212,7 @@ namespace Seven
 		// "accept" = [ S' -> S·, $ ]
 		Production accept = Grammar::Plist[0];
 		accept.ppos = 2;
-		accept.sstr = "$";
+		accept.sstr = Production::EndSymbol;
 
 		for(int i = 0; i < m; i++)
 		{
@@ -247,7 +247,7 @@ namespace Seven
 					if(k != -1 && j != -1)
 						TG[i * n2 + j] = k;
 				}
-				else if(p.exp[p.ppos] != Production::Null){
+				else if(p.exp[p.ppos] != Production::NullSymbol){
 					// 形如 [ A -> α·aβ, b ] ，其中a是终结符
 					// goto(状态i, a) 的编号 = k
 					// 则置 Action表(状态i, a) = 移动状态k进栈
@@ -261,7 +261,7 @@ namespace Seven
 			// 若 [ S' -> S·, $ ] 属于 U[i]
 			// 则置 Action表(状态i, $) = "accept"
 			if(U[i].find(accept) != U[i].end()){
-				int j = Grammar::findSymbol(A, "$");
+				int j = Grammar::findSymbol(A, Production::EndSymbol);
 				TA[i * n1 + j] = m;
 			}
 		}
