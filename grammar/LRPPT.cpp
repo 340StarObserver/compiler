@@ -234,8 +234,14 @@ namespace Seven
 						// 则置 Goto表(状态i, a) = A -> α 的编号
 						int k = Grammar::findProduction(tmp);
 						int j = Grammar::findSymbol(A, p.sstr);
-						if(k != -1 && j != -1)
-							TA[i * n1 + j] = -k;
+						if(k != -1 && j != -1){
+							if(TA[i * n1 + j] == 0)
+								TA[i * n1 + j] = -k;
+							else if(TA[i * n1 + j] != -k){
+								// 原先该位置有值 且 原值不等于冲突值，才需要处理冲突
+								dealCollision(TA, n1, i, j, TA[i * n1 + j], k, p.sstr);
+							}
+						}
 					}
 				}
 				else if(p.isVt[p.ppos] == false){
@@ -253,8 +259,14 @@ namespace Seven
 					// 则置 Action表(状态i, a) = 移动状态k进栈
 					int k = findState(U, closure(goTo(U[i], p.exp[p.ppos])));
 					int j = Grammar::findSymbol(A, p.exp[p.ppos]);
-					if(k != -1 && j != -1)
-						TA[i * n1 + j] = k;
+					if(k != -1 && j != -1){
+						if(TA[i * n1 + j] == 0)
+							TA[i * n1 + j] = k;
+						else if(TA[i * n1 + j] != k){
+							// 原先该位置有值 且 原值不等于冲突值，才需要处理冲突
+							dealCollision(TA, n1, i, j, k, -TA[i * n1 + j], p.exp[p.ppos]);
+						}
+					}
 				}
 			}
 
@@ -264,6 +276,51 @@ namespace Seven
 				int j = Grammar::findSymbol(A, Production::EndSymbol);
 				TA[i * n1 + j] = m;
 			}
+		}
+	}
+
+
+	/* 处理移动-归约冲突 */
+	void LRPPT::dealCollision(int * TA, int cols, int i, int j, int sx, int ry, const string & vt)
+	{
+		// 当前栈内优先级 pin = y号产生式中最后一个终结符的优先级
+		int pin = 0;
+		int n = Grammar::Plist[ry].exp.size() - 1;
+		while(n >= 0){
+			if(Grammar::Plist[ry].isVt[n] == true){
+				GSrule rule(Grammar::Plist[ry].exp[n], 0, 0);
+				set<GSrule>::iterator it = Grammar::VtRules.find(rule);
+				if(it != Grammar::VtRules.end()){
+					pin = (*it).getPriority();
+					break;
+				}
+			}
+			n--;
+		}
+
+		// pout = vt的优先级
+		// w     = vt的结合规则
+		int pout = 0;
+		bool w = false;
+		for(set<GSrule>::iterator it = Grammar::VtRules.begin(); it != Grammar::VtRules.end(); ++it){
+			if((*it).getSymbol() == vt){
+				pout = (*it).getPriority();
+				w = (*it).getCombine();
+				break;
+			}
+		}
+
+		if((pin < pout) || (pin == pout && w == false)){
+			// may be 1. 栈内距离栈顶最近的终结符的优先级 < 栈外读头下的文法符号的优先级
+			// may be 2. 优先级相同，但读头下的文法符号是右结合的
+			// 	移动状态x入栈
+			TA[i * cols + j] = sx;
+		}
+		else if((pin > pout) || (pin == pout && w == true)){
+			// may be 1. 栈内距离栈顶最近的终结符的优先级 > 栈外读头下的文法符号的优先级
+			// may be 2. 优先级相同，但读头下的文法符号是左结合的
+			// 	按y号产生式归约
+			TA[i * cols + j] = -ry;
 		}
 	}
 
@@ -284,37 +341,6 @@ namespace Seven
 			delete []_table_action;
 		if(_table_goto != NULL)
 			delete []_table_goto;
-	}
-
-
-	/* create */
-	LRPPT * LRPPT::create()
-	{
-		// 1. define result
-		LRPPT * ppt = new LRPPT();
-
-		// 2. calculate terminal-symbols, non-terminal-symbols
-		Grammar::classify(ppt->_symbol_A, ppt->_symbol_B);
-
-		// 3. calculate State0, State1, State2, ...
-		vector< set<Production> > U;
-		stateRace(U);
-
-		// 4. fill Table-Action, Table-Goto
-		int m = U.size();
-		int n1 = ppt->_symbol_A.size();
-		int n2 = ppt->_symbol_B.size();
-		int * TA = new int[m * n1];
-		int * TG = new int[m * n2];
-		buildPredictTable(U, ppt->_symbol_A, ppt->_symbol_B, TA, TG);
-
-		// 5. set ppt
-		ppt->_table_action = TA;
-		ppt->_table_goto = TG;
-		ppt->_rows = m;
-
-		// 6. return
-		return ppt;
 	}
 
 
@@ -357,6 +383,37 @@ namespace Seven
 			}
 			cout << '\n';
 		}
+	}
+
+
+	/* create */
+	LRPPT * LRPPT::create()
+	{
+		// 1. define result
+		LRPPT * ppt = new LRPPT();
+
+		// 2. calculate terminal-symbols, non-terminal-symbols
+		Grammar::classify(ppt->_symbol_A, ppt->_symbol_B);
+
+		// 3. calculate State0, State1, State2, ...
+		vector< set<Production> > U;
+		stateRace(U);
+
+		// 4. fill Table-Action, Table-Goto
+		int m = U.size();
+		int n1 = ppt->_symbol_A.size();
+		int n2 = ppt->_symbol_B.size();
+		int * TA = new int[m * n1];
+		int * TG = new int[m * n2];
+		buildPredictTable(U, ppt->_symbol_A, ppt->_symbol_B, TA, TG);
+
+		// 5. set ppt
+		ppt->_table_action = TA;
+		ppt->_table_goto = TG;
+		ppt->_rows = m;
+
+		// 6. return
+		return ppt;
 	}
 
 }

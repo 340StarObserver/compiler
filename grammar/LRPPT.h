@@ -96,6 +96,20 @@ namespace Seven
 		*/
 		static void buildPredictTable(const vector< set<Production> > & U, const vector<string> & A, const vector<string> & B, int * TA, int * TG);
 
+	public:
+		/*
+		处理移动-归约冲突
+		参数的解释 :
+			TA 	: 	预测分析表Action
+			cols 	: 	每行列数
+			i 	: 	冲突行号
+			j 	: 	冲突列号
+			sx 	: 	移动状态x入栈( x>=1 )
+			ry 	: 	按y号产生式归约( y>=1 )
+			vt 	: 	当前读头下的文法符号
+		*/
+		static void dealCollision(int * TA, int cols, int i, int j, int sx, int ry, const string & vt);
+
 	private:
 		/* 终结符列表( 包含 $ ) */
 		vector<string> _symbol_A;
