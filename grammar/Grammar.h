@@ -84,6 +84,7 @@ namespace Seven
 			B 	: 	用以保存非终结符列表
 		注意的地方 :
 			终结符列表的最后一个元素是"$"
+			非终结符列表 not include S'
 		*/
 		static void classify(vector<string> & A, vector<string> & B);
 
