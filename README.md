@@ -65,10 +65,10 @@ I just want to experience what a compiler is.
         	const char * path_input = "/home/seven/gitspace/compiler/bin/input.cpp";  
         	
         	// 分析结果日志的路径  
-        	const char * path_res = "/home/seven/gitspace/compiler/bin/res.log";  
+        	const char * path_res = "/home/seven/gitspace/compiler/bin/lex_res.log";  
         	
         	// 分析报错日志的路径  
-        	const char * path_error = "/home/seven/gitspace/compiler/bin/error.log";  
+        	const char * path_error = "/home/seven/gitspace/compiler/bin/lex_error.log";  
         
         
         	// 2. try to load optimized-DFA  

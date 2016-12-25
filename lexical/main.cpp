@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	05 December 2016
-Modified 	: 	11 December 2016
+Modified 	: 	25 December 2016
 Version 	: 	1.0
 */
 
@@ -23,8 +23,8 @@ int main()
 	const char * path_conf = "/home/seven/gitspace/compiler/conf/regex.conf";
 	const char * path_odfa = "/home/seven/gitspace/compiler/bin/odfa.dat";
 	const char * path_input = "/home/seven/gitspace/compiler/bin/input.cpp";
-	const char * path_res = "/home/seven/gitspace/compiler/bin/res.log";
-	const char * path_error = "/home/seven/gitspace/compiler/bin/error.log";
+	const char * path_res = "/home/seven/gitspace/compiler/bin/lex_res.log";
+	const char * path_error = "/home/seven/gitspace/compiler/bin/lex_error.log";
 
 	// 2. try to load optimized-DFA
 	ODFA * odfa = ODFA::load(path_odfa);
