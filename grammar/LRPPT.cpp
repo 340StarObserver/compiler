@@ -19,7 +19,12 @@ using std::ofstream;
 using std::ios;
 
 #include "rapidjson/document.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
 using rapidjson::Document;
+using rapidjson::Writer;
+using rapidjson::StringBuffer;
+using rapidjson::StringRef;
 
 namespace Seven
 {
@@ -419,6 +424,49 @@ namespace Seven
 
 		// 6. return
 		return ppt;
+	}
+
+
+	/* 以json格式记录一条结果 */
+	void LRPPT::log_res(ostream & out, const string & left, const vector<string> & right)
+	{
+		// 1. init
+		static const char * json = "{\"left\":\"\",\"right\":[]}";
+		Document d;
+		d.Parse(json);
+
+		// 2. set left
+		d["left"].SetString(StringRef(left.c_str()));
+
+		// 3. set right
+		Document::AllocatorType & allocator = d.GetAllocator();
+		for(size_t i = 0; i < right.size(); i++)
+			d["right"].PushBack(StringRef(right[i].c_str()), allocator);
+
+		// 4. output
+		StringBuffer buffer;
+		Writer<StringBuffer> writer(buffer);
+		d.Accept(writer);
+		out << buffer.GetString() << '\n';
+	}
+
+
+	/* 以json格式记录一条报错 */
+	void LRPPT::log_error(ostream & out, const string & word)
+	{
+		// 1. init
+		static const char * json = "{\"word\":\"\"}";
+		Document d;
+		d.Parse(json);
+
+		// 2. set word
+		d["word"].SetString(StringRef(word.c_str()));
+
+		// 3. output
+		StringBuffer buffer;
+		Writer<StringBuffer> writer(buffer);
+		d.Accept(writer);
+		out << buffer.GetString() << '\n';
 	}
 
 

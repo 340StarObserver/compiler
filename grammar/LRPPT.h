@@ -115,6 +115,24 @@ namespace Seven
 		static void dealCollision(int * TA, int cols, int i, int j, int sx, int ry, const string & vt);
 
 	private:
+		/*
+		以json格式记录一条结果
+		参数的解释 :
+			out 	: 	输出流
+			left 	: 	产生式左部
+			right 	: 	[ 右部单词1, 右部单词2, ... ]
+		*/
+		static void log_res(ostream & out, const string & left, const vector<string> & right);
+
+		/*
+		以json格式记录一条报错
+		参数的解释 :
+			out 	: 	输出流
+			word 	: 	出错单词
+		*/
+		static void log_error(ostream & out, const string & word);
+
+	private:
 		/* 终结符列表( 包含 $ ) */
 		vector<string> _symbol_A;
 
