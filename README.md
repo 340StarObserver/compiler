@@ -4,6 +4,8 @@
 Lexical analyzer & grammar analyzer for any language.  
 I just want to experience what a compiler is.  
 
+本工程在输入输出上用了一个第三方库 : rapidjson  
+
 
 ### 一.　目录结构 ###
 
@@ -19,6 +21,7 @@ I just want to experience what a compiler is.
                 语法分析  :  
                     07-Grammar.md        --  文法如何表示  
                     08-LR1.md            --  根据文法，构造LR(1)语法的预测分析表  
+                    09-ScanGrammar.md    --  使用预测分析表，对token序列（词法分析的结果）做语法分析  
 
         lexical/  
             词法分析代码模块  

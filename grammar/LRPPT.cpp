@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	20 December 2016
-Modified 	: 	24 December 2016
+Modified 	: 	27 December 2016
 Version 	: 	1.0
 */
 
@@ -13,8 +13,13 @@ using std::queue;
 #include <cstring>
 using std::memset;
 
-#include <iostream>
-using std::cout;
+#include <fstream>
+using std::ifstream;
+using std::ofstream;
+using std::ios;
+
+#include "rapidjson/document.h"
+using rapidjson::Document;
 
 namespace Seven
 {
@@ -414,6 +419,47 @@ namespace Seven
 
 		// 6. return
 		return ppt;
+	}
+
+
+	/* 对一个token序列的文件做语法检查 */
+	void LRPPT::scan(const char * path_input, const char * path_res, const char * path_error)const
+	{
+		// 1. read tokens from input file
+		vector< pair<string, string> > tokens;
+		pair<string, string> item;
+		string line;
+
+		ifstream in;
+		in.open(path_input, ios::in);
+		if(in.is_open() == true){
+			while(getline(in, line)){
+				Document d;
+				d.Parse(line.c_str());
+				item.first = d["type"].GetString();
+				item.second = d["word"].GetString();
+				tokens.push_back(item);
+			}
+			in.close();
+		}
+
+		// 2. prepare two output streams
+		ofstream out_res(path_res);
+		ofstream out_error(path_error);
+
+		// 3. do scan
+		scan(tokens, out_res, out_error);
+
+		// 4. close output streams
+		out_res.close();
+		out_error.close();
+	}
+
+
+	/* 对一段token序列做语法检查 */
+	void LRPPT::scan(const vector< pair<string, string> > & tokens, ostream & out_res, ostream & out_error)const
+	{
+		// wait code...
 	}
 
 }

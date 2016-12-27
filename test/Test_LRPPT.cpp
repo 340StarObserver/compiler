@@ -11,11 +11,18 @@ Version 	: 	1.0
 using Seven::Grammar;
 using Seven::LRPPT;
 
-/* test build LRPPT */
+/* test build LRPPT and scan */
 void test_1()
 {
+	const char * path_input = "/home/seven/gitspace/compiler/bin/lex_res.log";
+	const char * path_res = "/home/seven/gitspace/compiler/bin/grammar_res.log";
+	const char * path_error = "/home/seven/gitspace/compiler/bin/grammar_error.log";
+
 	LRPPT * ppt = LRPPT::create();
 	ppt->print();
+
+	ppt->scan(path_input, path_res, path_error);
+
 	delete ppt;
 }
 

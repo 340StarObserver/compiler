@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	20 December 2016
-Modified 	: 	24 December 2016
+Modified 	: 	27 December 2016
 Version 	: 	1.0
 */
 
@@ -9,6 +9,11 @@ Version 	: 	1.0
 #define _LRPPT_H
 
 #include "Grammar.h"
+
+#include <iostream>
+using std::cout;
+using std::ostream;
+using std::pair;
 
 namespace Seven
 {
@@ -96,7 +101,6 @@ namespace Seven
 		*/
 		static void buildPredictTable(const vector< set<Production> > & U, const vector<string> & A, const vector<string> & B, int * TA, int * TG);
 
-	public:
 		/*
 		处理移动-归约冲突
 		参数的解释 :
@@ -139,6 +143,40 @@ namespace Seven
 
 		/* print the LRPPT */
 		void print()const;
+
+
+		/*
+		对一段token序列做语法检查
+		参数的解释 :
+			tokens  	: 	token序列，里面每个pair形如 <文法符号, 对应代码中的单词>
+			out_res 	: 	结果输出流
+			out_error 	: 	报错输出流
+		结果输出流 :
+			每一行是 一个归约式, 形如 { "left" : 产生式左部, "right" : [ 右部单词1, 右部单词2, ... ] }
+		报错输出流 :
+			每一行是 一个出错点, 形如 { "word" : 出错单词 }
+		*/
+		void scan(const vector< pair<string, string> > & tokens, ostream & out_res, ostream & out_error)const;
+
+
+		/*
+		对一个token序列的文件做语法检查
+		参数的解释 :
+			path_input 	输入的token序列文件的路径
+			path_res 	输出的结果文件的路径
+			path_error 	输出的报错文件的路径
+		注意的地方 :
+			输入文件是词法分析的结果文件
+		*/
+		void scan(const char * path_input, const char * path_res, const char * path_error)const;
+
+
+		// 定义两个scan的考虑 :
+		// 1. 第一个scan方法更灵活
+		// 	待分析token序列可以来自任何地方
+		// 	结果和报错也可以重定向到多种地方( 屏幕 or 文件 or 网络 )
+		// 2. 第二个scan方法更方便
+		// 	大多数使用场景，数据源和结果都是文件，故调用方便
 	};
 }
 
