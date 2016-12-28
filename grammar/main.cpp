@@ -7,7 +7,7 @@ Version 	: 	1.0
 
 /* shows how to use grammar analyze */
 
-#include "../grammar/LRPPT.h"
+#include "LRPPT.h"
 using Seven::Grammar;
 using Seven::LRPPT;
 
