@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	20 December 2016
-Modified 	: 	27 December 2016
+Modified 	: 	28 December 2016
 Version 	: 	1.0
 */
 
@@ -160,7 +160,7 @@ namespace Seven
 		~LRPPT();
 
 		/* print the LRPPT */
-		void print()const;
+		void print(ostream & out)const;
 
 
 		/*
@@ -168,11 +168,11 @@ namespace Seven
 		参数的解释 :
 			tokens  	: 	token序列，里面每个pair形如 <文法符号, 对应代码中的单词>
 			out_res 	: 	结果输出流
+						每一行是 一个归约式, 形如 { "left" : 产生式左部, "right" : [ 右部单词1, 右部单词2, ... ] }
 			out_error 	: 	报错输出流
-		结果输出流 :
-			每一行是 一个归约式, 形如 { "left" : 产生式左部, "right" : [ 右部单词1, 右部单词2, ... ] }
-		报错输出流 :
-			每一行是 一个出错点, 形如 { "word" : 出错单词 }
+						每一行是 一个出错点, 形如 { "word" : 出错单词 }
+		注意的地方 :
+			token序列的最后一个元素必须是<"$","">
 		*/
 		void scan(const vector< pair<string, string> > & tokens, ostream & out_res, ostream & out_error)const;
 

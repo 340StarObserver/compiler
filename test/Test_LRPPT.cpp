@@ -1,17 +1,21 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	20 December 2016
-Modified 	: 	27 December 2016
+Modified 	: 	28 December 2016
 Version 	: 	1.0
 */
 
 /* This file used to test the class 'LRPPT' */
 
+#include <iostream>
+using std::cout;
+
 #include "../grammar/LRPPT.h"
 using Seven::Grammar;
 using Seven::LRPPT;
 
-/* test build LRPPT and scan */
+
+/* test build LRPPT */
 void test_1()
 {
 	const char * path_input = "/home/seven/gitspace/compiler/bin/lex_res.log";
@@ -19,12 +23,11 @@ void test_1()
 	const char * path_error = "/home/seven/gitspace/compiler/bin/grammar_error.log";
 
 	LRPPT * ppt = LRPPT::create();
-	ppt->print();
-
-	ppt->scan(path_input, path_res, path_error);
+	ppt->print(cout);
 
 	delete ppt;
 }
+
 
 int main()
 {

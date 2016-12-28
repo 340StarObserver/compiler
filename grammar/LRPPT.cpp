@@ -1,7 +1,7 @@
 /*
 Author 		: 	Lv Yang
 Created 	: 	20 December 2016
-Modified 	: 	27 December 2016
+Modified 	: 	28 December 2016
 Version 	: 	1.0
 */
 
@@ -10,6 +10,9 @@ Version 	: 	1.0
 #include <queue>
 using std::queue;
 
+#include <stack>
+using std::stack;
+
 #include <cstring>
 using std::memset;
 
@@ -17,6 +20,9 @@ using std::memset;
 using std::ifstream;
 using std::ofstream;
 using std::ios;
+
+#include <algorithm>
+using std::reverse;
 
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
@@ -355,43 +361,43 @@ namespace Seven
 
 
 	/* print the LRPPT */
-	void LRPPT::print()const
+	void LRPPT::print(ostream & out)const
 	{
 		int m = _rows;
 		int n1 = _symbol_A.size();
 		int n2 = _symbol_B.size();
 
-		cout << '\t';
+		out << '\t';
 		for(int i = 0; i < n1; i++)
-			cout << '\t' << _symbol_A[i];
-		cout << "\t|";
+			out << '\t' << _symbol_A[i];
+		out << "\t|";
 		for(int i = 0; i < n2; i++)
-			cout << '\t' << _symbol_B[i];
-		cout << '\n';
+			out << '\t' << _symbol_B[i];
+		out << '\n';
 
 		for(int i = 0; i < m; i++)
 		{
-			cout << "I[" << i << "] ";
+			out << "I[" << i << "] ";
 			if(i < 10)
-				cout << ' ';
-			cout << ": \t";
+				out << ' ';
+			out << ": \t";
 			for(int j = 0; j < n1; j++){
 				int t = _table_action[i * n1 + j];
 				if(t == m)
-					cout << "Acc";
+					out << "Acc";
 				else if(t > 0)
-					cout << 'S' << t;
+					out << 'S' << t;
 				else if(t < 0)
-					cout << 'r' << -t;
+					out << 'r' << -t;
 				else
-					cout << t;
-				cout << '\t';
+					out << t;
+				out << '\t';
 			}
-			cout << "|\t";
+			out << "|\t";
 			for(int j = 0; j < n2; j++){
-				cout << _table_goto[i * n2 + j] << '\t';
+				out << _table_goto[i * n2 + j] << '\t';
 			}
-			cout << '\n';
+			out << '\n';
 		}
 	}
 
@@ -488,6 +494,12 @@ namespace Seven
 				item.second = d["word"].GetString();
 				tokens.push_back(item);
 			}
+
+			// finally, add "$"
+			item.first = Production::EndSymbol;
+			item.second = "";
+			tokens.push_back(item);
+
 			in.close();
 		}
 
@@ -507,7 +519,86 @@ namespace Seven
 	/* 对一段token序列做语法检查 */
 	void LRPPT::scan(const vector< pair<string, string> > & tokens, ostream & out_res, ostream & out_error)const
 	{
-		// wait code...
+		// 用 q 指向文法符号序列的当前位置
+		size_t q = 0;
+
+		// prepare 状态栈A, 压入状态0
+		stack<int> A;
+		A.push(0);
+
+		// prepare 文法符号栈B
+		stack< pair<string, string> > B;
+
+		// prepare some temp variables
+		int i, j, cur;
+		int n1 = _symbol_A.size(), n2 = _symbol_B.size();
+
+		// do analyse
+		while(A.empty() == false && q < tokens.size())
+		{
+			i = A.top();
+			j = Grammar::findSymbol(_symbol_A, tokens[q].first);
+
+			// tokens[q] is not supported
+			if(j < 0 || j >= n1){
+				log_error(out_error, tokens[q].second);
+				return;
+			}
+
+			// calculate Action(i,j)
+			cur = _table_action[i * n1 + j];
+
+			if(cur == _rows){
+				/* Action(i,j) is "Accept" */
+				return;
+			}
+			else if(cur > 0){
+				/* Action(i,j) is "移动状态x进栈" */
+				A.push(cur);
+				B.push(tokens[q++]);
+			}
+			else if(cur < 0){
+				/* Action(i,j) is "按y(>=1)号产生式归约" */
+
+				// n = y号产生式右部的长度
+				int n = Grammar::Plist[-cur].exp.size() - 1;
+				if(A.size() < n + 1 || B.size() < n){
+					log_error(out_error, tokens[q].second);
+					return;
+				}
+
+				// pop 状态栈A n个元素
+				// pop 符号栈B n个元素( 假设依次弹出 c1, c2, ...cn )
+				vector<string> p_right;
+				while(n > 0){
+					A.pop();
+					p_right.push_back(B.top().second);
+					B.pop();
+					n--;
+				}
+				reverse(p_right.begin(), p_right.end());
+
+				// 输出一个归约式 S -> cn cn-1 ... c2 c1
+				string p_left = Grammar::Plist[-cur].exp[0];
+				log_res(out_res, p_left, p_right);
+
+				// 令 i = 状态栈A.top
+				// 令 j  = y号产生式的左部
+				// push Goto(i, j) to 状态栈A
+				// push j             to 符号栈B
+				i = A.top();
+				j = Grammar::findSymbol(_symbol_B, p_left);
+				if(j >= 0 && j < n2){
+					A.push(_table_goto[i * n2 + j]);
+					B.push(pair<string, string>(p_left, p_left));
+				}
+			}
+			else{
+				/* Action(i,j) is "Error" */
+				log_error(out_error, tokens[q].second);
+				return;
+			}
+		}
 	}
 
 }

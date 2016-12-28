@@ -1,0 +1,7 @@
+{"id":1,"word":"if","type":"if"}
+{"id":2,"word":"E1","type":"a"}
+{"id":3,"word":"else","type":"else"}
+{"id":4,"word":"E2","type":"a"}
+{"id":5,"word":";","type":";"}
+{"id":6,"word":"if","type":"if"}
+{"id":7,"word":"E3","type":"a"}
