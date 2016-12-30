@@ -54,6 +54,9 @@ I just want to experience what a compiler is.
                 grammar_res.log          --  语法分析的结果日志  
                 grammar_error.log        --  语法分析的报错日志  
             }  
+        
+        make_lexical.sh                  --  Linux下快速编译词法分析模块的脚本  
+        make_grammar.sh                  --  Linux下快速编译语法分析模块的脚本  
 
 
 ### 二.　如何调用词法分析 ###
