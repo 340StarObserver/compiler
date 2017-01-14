@@ -39,7 +39,7 @@
         if op 是二元运算符 :  
             从栈B中依次弹出两个表达式，记作 exp1 exp2  
             把 exp2 exp1 op 这个整体（注意exp1和exp2的顺序）压入栈B  
-            // 例如，op是.，从栈A先弹出exp1=a，再弹出exp2=b，则把 ba. 这个整体压入栈B  
+            // 例如，op是.，从栈B先弹出exp1=a，再弹出exp2=b，则把 ba. 这个整体压入栈B  
 
 
 
